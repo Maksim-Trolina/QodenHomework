@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -17,8 +18,18 @@ namespace WebApplication
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateHostBuilder(string[] args) =>
+        private static IWebHostBuilder CreateHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((ctx, builder) =>
+                {
+                    builder.SetBasePath(ConfigDirectoryPath()).AddJsonFile("config.json"); 
+                })
                 .UseStartup<Startup>();
+
+        private static string ConfigDirectoryPath()
+        {
+            var exeLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            return Path.Combine(Path.GetDirectoryName(exeLocation), "Configuration");
+        }
     }
 }

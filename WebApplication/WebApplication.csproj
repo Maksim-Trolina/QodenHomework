@@ -4,4 +4,12 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="./Configuration" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+    
 </Project>

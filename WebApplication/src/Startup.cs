@@ -17,6 +17,8 @@ namespace WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            
+            ConfigureDatabase(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -30,6 +32,11 @@ namespace WebApplication
             app.UseRouting();
 
             app.UseEndpoints(x => x.MapControllers());
+        }
+
+        private void ConfigureDatabase(IServiceCollection services)
+        {
+            services.AddEntityFrameworkNpgsql();
         }
     }
 }
