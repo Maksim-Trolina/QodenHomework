@@ -25,10 +25,8 @@ namespace WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = new PathString("api/sign-in");
-                });
+                .AddCookie();
+            
             services.AddMvc();
 
             ConfigureDatabase(services);
@@ -45,7 +43,7 @@ namespace WebApplication
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthorization();    
 
             app.UseEndpoints(x => x.MapControllers());
         }
