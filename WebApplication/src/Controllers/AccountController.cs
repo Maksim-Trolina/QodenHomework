@@ -5,12 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using WebApplication.Database;
 
 namespace WebApplication.Controllers
 {
     [Route("account")]
     public class AccountController : ControllerBase
     {
+        private UserDbContext userDb;
+
+        public AccountController(UserDbContext userDb)
+        {
+            this.userDb = userDb;
+        }
+        
         [Route("sign-in")]
         public async Task<string> Login(string userName)
         {
