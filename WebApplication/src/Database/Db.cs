@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database.Models;
-using WebApplication.Helpers;
 
 namespace WebApplication.Database
 {
-    public class UserDbContext : DbContext
+    public class Db : DbContext
     {
-        public UserDbContext(DbContextOptions<UserDbContext> options)
+        public Db(DbContextOptions<Db> options)
             : base(options)
         {
             Database.EnsureCreated();
@@ -24,16 +23,6 @@ namespace WebApplication.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            /*this.ApplySnakeCase(modelBuilder);
-            this.ApplyOnModelCreatingFromAllEntities(modelBuilder);*/
-
-            /*modelBuilder.Entity<User>()
-                .HasMany(u => u.Accounts)
-                .WithOne(ac => ac.User)
-                .HasForeignKey(ac => ac.UserId)
-                .HasPrincipalKey(u => u.Id);*/
-            
-            
             modelBuilder.Entity<User>().HasData(
                 new User
                 {

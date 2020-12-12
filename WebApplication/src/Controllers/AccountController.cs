@@ -82,7 +82,28 @@ namespace WebApplication.Controllers
         [Route("account/put")]
         public async Task AddMoney(string currency, decimal value,string accountId)
         {
-            await userDb.AddMoney(currency, value, accountId);
+            await userDb.AddMoney(currency, value, accountId,User.Identity.Name);
+        }
+
+        [Authorize]
+        [Route("currency/delete")]
+        public async Task DeleteCurrency(string currency)
+        {
+            await userDb.DeleteCurrency(currency, User.Identity.Name);
+        }
+
+        [Authorize]
+        [Route("currency/add")]
+        public async Task AddCurrency(string currency, decimal coast)
+        {
+            await userDb.AddCurrency(currency, User.Identity.Name, coast);
+        }
+
+        [Authorize]
+        [Route("money/transfer")]
+        public async Task TransferMoney(string currency, decimal value, string accountId)
+        {
+            
         }
         
         /*[Authorize]

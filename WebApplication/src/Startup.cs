@@ -33,6 +33,8 @@ namespace WebApplication
 
             services.AddScoped<IDbService, DbService>();
 
+            services.AddScoped<IFinancialService, FinancialService>();
+
             ConfigureDatabase(services);
         }
 
@@ -55,7 +57,7 @@ namespace WebApplication
         private void ConfigureDatabase(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql();
-            services.AddDbContext<UserDbContext>((options) =>
+            services.AddDbContext<Db>((options) =>
             {
                 options.UseNpgsql(configuration["Database:ConnectionString"]);
             });

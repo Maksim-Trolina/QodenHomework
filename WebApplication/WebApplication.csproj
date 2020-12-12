@@ -16,8 +16,4 @@
         <Content Include="./Configuration" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
     
-    <ItemGroup>
-      <Folder Include="Migrations" />
-    </ItemGroup>
-    
 </Project>
