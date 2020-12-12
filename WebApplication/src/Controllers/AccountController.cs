@@ -14,7 +14,7 @@ using WebApplication.Services;
 
 namespace WebApplication.Controllers
 {
-    [Route("account")]
+    [Route("api")]
     public class AccountController : ControllerBase
     {
         private IDbService userDb;
@@ -56,9 +56,9 @@ namespace WebApplication.Controllers
 
             if (user == null)
             {
-                int id = await userDb.GetLastId();
+                /*int id = await userDb.GetLastId();*/
 
-                userDb.AddUser(userName, password, id);
+                userDb.AddUser(userName, password);
 
                 await Authenticate(user.Id.ToString());
 
@@ -66,6 +66,13 @@ namespace WebApplication.Controllers
             }
 
             return "Вы не зарегистрировались в системе";
+        }
+
+        [Authorize]
+        [Route("register/account")]
+        public async Task<string> RegisterAccount()
+        {
+            return "sasi";
         }
 
         private async Task Authenticate(string userId)

@@ -10,8 +10,7 @@ namespace WebApplication.Database
         public UserDbContext(DbContextOptions<UserDbContext> options)
             : base(options)
         {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         public DbSet<User> Users { get; set; }
@@ -24,7 +23,7 @@ namespace WebApplication.Database
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     UserName = "Admin",
                     Password = "Admin",
                     Role = "Admin"

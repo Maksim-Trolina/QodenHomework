@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database;
@@ -9,9 +10,9 @@ namespace WebApplication.Services
     {
         Task<User> GetUser(string userName, string password);
 
-        Task<int> GetLastId();
+        /*Task<int> GetLastId();*/
 
-        Task AddUser(string userName,string password,int id);
+        Task AddUser(string userName,string password);
     }
     public class DbService : IDbService
     {
@@ -27,14 +28,14 @@ namespace WebApplication.Services
             return await userDb.Users.FirstOrDefaultAsync(x => x.UserName == userName &&
                                                                x.Password == password);
         }
-        public async Task<int> GetLastId()
+        /*public async Task<int> GetLastId()
         {
             return await userDb.Users.MaxAsync(x => x.Id);
-        }
+        }*/
 
-        public async Task AddUser(string userName,string password,int id)
+        public async Task AddUser(string userName,string password)
         {
-            var user = new User{Id = ++id,UserName = userName,Password = password,Role = "User"};
+            var user = new User{Id = Guid.NewGuid(),UserName = userName,Password = password,Role = "User"};
             
             await userDb.Users.AddAsync(user);
 
