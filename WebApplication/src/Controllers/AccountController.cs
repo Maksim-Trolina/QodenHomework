@@ -77,6 +77,13 @@ namespace WebApplication.Controllers
 
             return account.UserId.ToString();
         }
+
+        [Authorize]
+        [Route("account/put")]
+        public async Task AddMoney(string currency, decimal value,string accountId)
+        {
+            await userDb.AddMoney(currency, value, accountId);
+        }
         
         /*[Authorize]
         [Route("money/add")]

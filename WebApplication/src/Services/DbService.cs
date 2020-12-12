@@ -11,12 +11,12 @@ namespace WebApplication.Services
     public interface IDbService
     {
         Task<User> GetUser(string userName, string password);
-
-        /*Task<int> GetLastId();*/
-
+        
         Task<User> AddUser(string userName,string password);
 
         Task<Account> AddAccount(string userId);
+
+        Task AddMoney(string currency, decimal value, string accountId);
     }
     public class DbService : IDbService
     {
@@ -53,11 +53,45 @@ namespace WebApplication.Services
         {
             var account = new Account {Id = Guid.NewGuid(), UserId = Guid.Parse(userId)};
 
+            var currencies = userDb.CurrencyNames.ToList();
+
+            foreach (var currency in currencies)
+            {
+                CurrencyUser cur = new CurrencyUser
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = account.Id,
+                    Name = currency.Id,
+                    Value = 0,
+                    InputCommision = currency.InputCommision,
+                    InputLimit = currency.InputLimit,
+                    OutputCommision = currency.OutputCommision,
+                    OutputLimit = currency.OutputLimit,
+                    TransferCommision = currency.TransferCommision,
+                    TransferLimit = currency.TransferLimit
+                };
+
+                await userDb.CurrencyUsers.AddAsync(cur);
+            }
+
             await userDb.Accounts.AddAsync(account);
 
             await userDb.SaveChangesAsync();
 
             return account;
+        }
+
+        public async Task AddMoney(string currency, decimal value, string accountId)
+        {
+            Guid id = Guid.Parse(accountId);
+            CurrencyUser currencyUser = await userDb.CurrencyUsers.FirstOrDefaultAsync(x => x.AccountId == id &&
+                x.Name == currency);
+            
+            currencyUser.Value += value;
+
+            userDb.CurrencyUsers.Update(currencyUser);
+
+            await userDb.SaveChangesAsync();
         }
     }
 }
