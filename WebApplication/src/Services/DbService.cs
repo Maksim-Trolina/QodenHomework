@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database;
@@ -12,7 +14,9 @@ namespace WebApplication.Services
 
         /*Task<int> GetLastId();*/
 
-        Task AddUser(string userName,string password);
+        Task<User> AddUser(string userName,string password);
+
+        Task<Account> AddAccount(string userId);
     }
     public class DbService : IDbService
     {
@@ -33,13 +37,27 @@ namespace WebApplication.Services
             return await userDb.Users.MaxAsync(x => x.Id);
         }*/
 
-        public async Task AddUser(string userName,string password)
+        public async Task<User> AddUser(string userName,string password)
         {
+            /*int id = await userDb.Users.MaxAsync(x => x.Id);*/
             var user = new User{Id = Guid.NewGuid(),UserName = userName,Password = password,Role = "User"};
             
             await userDb.Users.AddAsync(user);
 
             await userDb.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<Account> AddAccount(string userId)
+        {
+            var account = new Account {Id = Guid.NewGuid(), UserId = Guid.Parse(userId)};
+
+            await userDb.Accounts.AddAsync(account);
+
+            await userDb.SaveChangesAsync();
+
+            return account;
         }
     }
 }

@@ -2,9 +2,12 @@ using System;
 
 namespace WebApplication
 {
-    public class Currency
+    public class CurrencyUser
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
+
+        public Guid AccountId { get; set; }
+        public string Name { get; set; }
         public decimal Value { get; set; }
         public decimal InputCommision { get; set; }
         public decimal OutputCommision { get; set; }

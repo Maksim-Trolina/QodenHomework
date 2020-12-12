@@ -34,6 +34,7 @@ namespace WebApplication.Controllers
                 await Authenticate(user.Id.ToString());
 
                 return "Вы вошли в систему";
+                
             }
 
             return "Вы не вошли в систему";
@@ -58,7 +59,7 @@ namespace WebApplication.Controllers
             {
                 /*int id = await userDb.GetLastId();*/
 
-                userDb.AddUser(userName, password);
+                user = await userDb.AddUser(userName, password);
 
                 await Authenticate(user.Id.ToString());
 
@@ -72,8 +73,14 @@ namespace WebApplication.Controllers
         [Route("register/account")]
         public async Task<string> RegisterAccount()
         {
-            return "sasi";
+            var account = await userDb.AddAccount(User.Identity.Name);
+
+            return account.UserId.ToString();
         }
+        
+        /*[Authorize]
+        [Route("money/add")]
+        public async Task<string> AddMoney()*/
 
         private async Task Authenticate(string userId)
         {
