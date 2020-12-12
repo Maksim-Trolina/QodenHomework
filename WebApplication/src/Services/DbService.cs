@@ -202,10 +202,11 @@ namespace WebApplication.Services
             {
                 return;
             }
-
+            
+            Guid accId = Guid.Parse(accountId);
+            
             if (user.Role == "Admin")
             {
-                Guid accId = Guid.Parse(accountId);
                 var cur = await _db.CurrencyUsers.FirstOrDefaultAsync(x => x.AccountId == accId &&
                                                                            x.Name == currency);
                 if (cur != null)
@@ -219,7 +220,29 @@ namespace WebApplication.Services
             }
             else
             {
+                var account = await _db.Accounts.FirstOrDefaultAsync(x => x.Id == accId);
+
+                var accountOut = await _db.Accounts.FirstOrDefaultAsync(x => x.UserId == id);
+
+                if (account.UserId == id)
+                {
+                    return;
+                }
                 
+                CurrencyUser currencyUser = await _db.CurrencyUsers.FirstOrDefaultAsync(x => x.AccountId == account.Id &&
+                    x.Name == currency);
+
+                CurrencyUser currencyOutUser = await _db.CurrencyUsers.FirstOrDefaultAsync(x =>
+                    x.AccountId == accountOut.Id &&
+                    x.Name == currency);
+
+                currencyUser.Value += coast;
+
+                currencyOutUser.Value -= coast;
+                
+                _db.CurrencyUsers.UpdateRange(currencyUser,currencyOutUser);
+
+                await _db.SaveChangesAsync();
             }
         }
 
