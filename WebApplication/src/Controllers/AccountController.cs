@@ -10,15 +10,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database;
 using WebApplication.Database.Models;
+using WebApplication.Services;
 
 namespace WebApplication.Controllers
 {
     [Route("account")]
     public class AccountController : ControllerBase
     {
-        private UserDbContext userDb;
+        private IDbService userDb;
 
-        public AccountController(UserDbContext userDb)
+        public AccountController(IDbService userDb)
         {
             this.userDb = userDb;
         }
@@ -26,8 +27,7 @@ namespace WebApplication.Controllers
         [Route("login")]
         public async Task<string> Login(string userName,string password)
         {
-            User user = await userDb.Users.FirstOrDefaultAsync(x => x.UserName == userName && 
-                                                                    x.Password == password);
+            User user = await userDb.GetUser(userName, password);
 
             if (user != null)
             {
@@ -52,17 +52,13 @@ namespace WebApplication.Controllers
         [Route("register")]
         public async Task<string> Register(string userName,string password)
         {
-            User user = await userDb.Users.FirstOrDefaultAsync(x => x.UserName == userName && 
-                                                                    x.Password == password);
+            User user = await userDb.GetUser(userName, password);
 
             if (user == null)
             {
-                int id = await userDb.Users.MaxAsync(x => x.Id);
-                user = new User{Id = ++id, UserName = userName, Password = password, Role = "User"};
-                
-                userDb.Users.Add(user);
+                int id = await userDb.GetLastId();
 
-                await userDb.SaveChangesAsync();
+                userDb.AddUser(userName, password, id);
 
                 await Authenticate(user.Id.ToString());
 

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using WebApplication.Database;
 using Microsoft.EntityFrameworkCore.Design;
+using WebApplication.Services;
 
 namespace WebApplication
 {
@@ -29,6 +30,8 @@ namespace WebApplication
                 .AddCookie();
             
             services.AddMvc();
+
+            services.AddScoped<IDbService, DbService>();
 
             ConfigureDatabase(services);
         }
