@@ -124,24 +124,73 @@ namespace WebApplication.Controllers
         [Route("set/limit/transfer/all")]
         public async Task SetLimitTransfer(string currency, decimal limit)
         {
-            
+            await userDb.SetLimitTransferAll(currency, limit, User.Identity.Name);
         }
         
         [Authorize]
         [Route("set/limit/transfer")]
         public async Task SetLimitTransfer(string currency, decimal commission, string userId)
         {
-            await userDb.SetCommissionTransferUser(currency, commission, userId, User.Identity.Name);
+            await userDb.SetLimitTransfer(currency, commission, userId, User.Identity.Name);
         }
         
-        /*
+        [Authorize]
+        [Route("set/limit/input/all")]
+        public async Task SetLimitInput(string currency, decimal limit)
+        {
+            await userDb.SetLimitInputAll(currency, limit, User.Identity.Name);
+        }
+        
+        [Authorize]
+        [Route("set/limit/input")]
+        public async Task SetLimitInput(string currency, decimal commission, string userId)
+        {
+            await userDb.SetLimitInput(currency, commission, userId, User.Identity.Name);
+        }
+        
+        [Authorize]
+        [Route("set/limit/output/all")]
+        public async Task SetLimitOutput(string currency, decimal limit)
+        {
+            await userDb.SetLimitOutputAll(currency, limit, User.Identity.Name);
+        }
+        
+        [Authorize]
+        [Route("set/limit/output")]
+        public async Task SetLimitOutput(string currency, decimal commission, string userId)
+        {
+            await userDb.SetLimitOutput(currency, commission, userId, User.Identity.Name);
+        }
+        
         [Authorize]
         [Route("set/commission/input/all")]
-        public async Task SetLimitTransfer(string currency, decimal limit)
+        public async Task SetCommissionInput(string currency, decimal limit)
         {
-            
+            await userDb.SetCommissionInputAll(currency, limit, User.Identity.Name);
         }
-        */
+        
+        [Authorize]
+        [Route("set/commission/input")]
+        public async Task SetCommissionInput(string currency, decimal commission, string userId)
+        {
+            await userDb.SetCommissionInput(currency, commission, userId, User.Identity.Name);
+        }
+        
+        [Authorize]
+        [Route("set/commission/output/all")]
+        public async Task SetCommissionOutput(string currency, decimal limit)
+        {
+            await userDb.SetCommissionOutputAll(currency, limit, User.Identity.Name);
+        }
+        
+        [Authorize]
+        [Route("set/commission/output")]
+        public async Task SetCommissionOutput(string currency, decimal commission, string userId)
+        {
+            await userDb.SetCommissionOutput(currency, commission, userId, User.Identity.Name);
+        }
+        
+        
         
         private async Task Authenticate(string userId)
         {

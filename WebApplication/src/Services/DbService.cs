@@ -29,6 +29,27 @@ namespace WebApplication.Services
         public Task SetCommissionTransferAll(string currency, decimal commission, string userId);
 
         public Task SetCommissionTransferUser(string currency, decimal commision, string userId, string adminId);
+
+        public Task SetLimitTransferAll(string currency, decimal limit, string userId);
+
+        public Task SetLimitTransfer(string currency, decimal limit, string userId, string adminId);
+
+        public Task SetLimitInputAll(string currency, decimal limit, string userId);
+
+        public Task SetLimitInput(string currency, decimal limit, string userId, string adminId);
+
+        public Task SetLimitOutputAll(string currency, decimal limit, string userId);
+
+        public Task SetLimitOutput(string currency, decimal limit, string userId, string adminId);
+
+        public Task SetCommissionInputAll(string currency, decimal commission, string userId);
+
+        public Task SetCommissionInput(string currency, decimal commission, string userId, string adminId);
+
+        public Task SetCommissionOutputAll(string currency, decimal commission, string userId);
+
+        public Task SetCommissionOutput(string currency, decimal commission, string userId, string adminId);
+
     }
     public class DbService : IDbService
     {
