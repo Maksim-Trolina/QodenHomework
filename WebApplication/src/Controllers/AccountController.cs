@@ -103,13 +103,46 @@ namespace WebApplication.Controllers
         [Route("money/transfer")]
         public async Task TransferMoney(string currency, decimal value, string accountId)
         {
+            await userDb.TransferMoney(currency, value, accountId, User.Identity.Name);
+        }
+
+        [Authorize]
+        [Route("set/commission/transfer/all")]
+        public async Task SetCommissionTransfer(string currency,decimal commission)
+        {
+            await userDb.SetCommissionTransferAll(currency, commission, User.Identity.Name);
+        }
+
+        [Authorize]
+        [Route("set/commission/transfer")]
+        public async Task SetCommissionTransfer(string currency, decimal commission, string userId)
+        {
+            await userDb.SetCommissionTransferUser(currency, commission, userId, User.Identity.Name);
+        }
+
+        [Authorize]
+        [Route("set/limit/transfer/all")]
+        public async Task SetLimitTransfer(string currency, decimal limit)
+        {
             
         }
         
-        /*[Authorize]
-        [Route("money/add")]
-        public async Task<string> AddMoney()*/
-
+        [Authorize]
+        [Route("set/limit/transfer")]
+        public async Task SetLimitTransfer(string currency, decimal commission, string userId)
+        {
+            await userDb.SetCommissionTransferUser(currency, commission, userId, User.Identity.Name);
+        }
+        
+        /*
+        [Authorize]
+        [Route("set/commission/input/all")]
+        public async Task SetLimitTransfer(string currency, decimal limit)
+        {
+            
+        }
+        */
+        
         private async Task Authenticate(string userId)
         {
             var claims = new List<Claim>

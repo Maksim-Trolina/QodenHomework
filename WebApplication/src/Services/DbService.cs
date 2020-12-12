@@ -25,6 +25,10 @@ namespace WebApplication.Services
         public Task TransferMoney(string currency, decimal coast, string accountId,string userId);
 
         public Task TakeMoney(string currency, decimal coast, string accountId, string userId);
+
+        public Task SetCommissionTransferAll(string currency, decimal commission, string userId);
+
+        public Task SetCommissionTransferUser(string currency, decimal commision, string userId, string adminId);
     }
     public class DbService : IDbService
     {
@@ -224,5 +228,390 @@ namespace WebApplication.Services
                 }
             }
         }
+
+        public async Task SetCommissionTransferAll(string currency, decimal commission, string userId)
+        {
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.TransferCommision = commission;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.TransferCommision = cur.TransferCommision;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }
+            
+        }
+
+        public async Task SetCommissionTransferUser(string currency, decimal commision, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.TransferCommision = commision;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+        
+        public async Task SetLimitTransferAll(string currency,decimal limit,string userId){
+            
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.TransferLimit = limit;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.TransferLimit = cur.TransferLimit;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }}
+
+        public async Task SetLimitTransfer(string currency, decimal limit, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.TransferLimit = limit;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task SetLimitInputAll(string currency, decimal limit, string userId)
+        {
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.InputLimit = limit;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.InputLimit = cur.InputLimit;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task SetLimitInput(string currency, decimal limit, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.InputLimit = limit;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task SetLimitOutputAll(string currency, decimal limit, string userId)
+        {
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.OutputLimit = limit;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.OutputLimit = cur.OutputLimit;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task SetLimitOutput(string currency, decimal limit, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.OutputLimit = limit;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task SetCommissionInputAll(string currency, decimal commission, string userId)
+        {
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.InputCommision = commission;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.InputCommision = cur.InputCommision;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task SetCommissionInput(string currency, decimal commission, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.InputCommision = commission;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task SetCommissionOutputAll(string currency, decimal commission, string userId)
+        {
+            Guid id = Guid.Parse(userId);
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (user != null)
+            {
+                var cur = await _db.CurrencyNames.FirstOrDefaultAsync(x => x.Id == currency);
+
+                cur.OutputCommision = commission;
+
+                var currencyUsers = await _db.CurrencyUsers.Where(x => x.Name == currency).ToListAsync();
+
+                if (currencyUsers != null)
+                {
+                    foreach (var curUser in currencyUsers)
+                    {
+                        curUser.OutputCommision = cur.OutputCommision;
+                    }
+
+                    _db.CurrencyUsers.UpdateRange(currencyUsers);
+                }
+
+                _db.CurrencyNames.Update(cur);
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task SetCommissionOutput(string currency, decimal commission, string userId, string adminId)
+        {
+            Guid id = Guid.Parse(adminId);
+
+            var admin = await _db.Users.FirstOrDefaultAsync(x => x.Id == id && x.Role == "Admin");
+
+            if (admin != null)
+            {
+                Guid idUser = Guid.Parse(userId);
+
+                var accountsId = await _db.Accounts.Where(x => x.UserId == idUser).Select(x => x.Id).ToListAsync();
+
+                if (accountsId != null)
+                {
+                    foreach (var acc in accountsId)
+                    {
+                        var currencyUsers = await _db.CurrencyUsers.Where(x => x.AccountId == acc).ToListAsync();
+
+                        if (currencyUsers != null)
+                        {
+                            foreach (var currencyUser in currencyUsers)
+                            {
+                                currencyUser.OutputCommision = commission;
+                            }
+                            
+                            _db.CurrencyUsers.UpdateRange(currencyUsers);
+
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+     
     }
 }
