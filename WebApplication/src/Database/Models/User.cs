@@ -13,6 +13,8 @@ namespace WebApplication.Database.Models
 
         public string Role { get; set; }
 
+        public string MyParam { get; set; }
+
         /*public List<Account> Accounts { get; set; }*/
 
         /*public List<CurrencyUser> Currencies { get; set; }*/

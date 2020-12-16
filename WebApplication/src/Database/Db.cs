@@ -10,7 +10,7 @@ namespace WebApplication.Database
         public Db(DbContextOptions<Db> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            /*Database.EnsureCreated();*/
         }
 
         public DbSet<User> Users { get; set; }
