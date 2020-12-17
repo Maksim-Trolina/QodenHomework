@@ -17,14 +17,10 @@ namespace WebApplication.Controllers
     [Route("api")]
     public class AccountController : ControllerBase
     {
-        private IDbService userDb;
-
-        public AccountController(IDbService userDb)
-        {
-            this.userDb = userDb;
-        }
         
-        [Route("login")]
+        
+        /*
+        /*[Route("login")]
         public async Task<string> Login(string userName,string password)
         {
             User user = await userDb.GetUser(userName, password);
@@ -39,7 +35,7 @@ namespace WebApplication.Controllers
 
             return "Вы не вошли в систему";
 
-        }
+        }#1#
 
         [Authorize]
         [Route("logout")]
@@ -50,14 +46,14 @@ namespace WebApplication.Controllers
             return "Вы вышли из системы";
         }
         
-        [Route("register")]
+        /*[Route("register")]
         public async Task<string> Register(string userName,string password)
         {
             User user = await userDb.GetUser(userName, password);
 
             if (user == null)
             {
-                /*int id = await userDb.GetLastId();*/
+                /*int id = await userDb.GetLastId();#2#
 
                 user = await userDb.AddUser(userName, password);
 
@@ -67,7 +63,7 @@ namespace WebApplication.Controllers
             }
 
             return "Вы не зарегистрировались в системе";
-        }
+        }#1#
 
         [Authorize]
         [Route("register/account")]
@@ -202,6 +198,6 @@ namespace WebApplication.Controllers
             ClaimsIdentity id = new ClaimsIdentity(claims,"ApplicationCookie",ClaimsIdentity.DefaultNameClaimType,ClaimsIdentity.DefaultRoleClaimType);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }
+        }*/
     }
 }

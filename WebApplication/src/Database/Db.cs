@@ -10,11 +10,9 @@ namespace WebApplication.Database
         public Db(DbContextOptions<Db> options)
             : base(options)
         {
-            /*Database.EnsureCreated();*/
+
         }
-
-        public DbSet<User> Users { get; set; }
-
+        
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<CurrencyAll> CurrencyNames { get; set; }
@@ -23,20 +21,14 @@ namespace WebApplication.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = Guid.NewGuid(),
-                    UserName = "Admin",
-                    Password = "Admin",
-                    Role = "Admin"
-                });
+            modelBuilder.Entity<Account>()
+                .HasKey(u => u.UserMail);
 
-            modelBuilder.Entity<CurrencyAll>().HasData(
-                new CurrencyAll
-                {
-                    Id = "bucks"
-                });
+            modelBuilder.Entity<CurrencyAll>()
+                .HasKey(u => u.CurrencyName);
+
+            modelBuilder.Entity<CurrencyUser>()
+                .HasKey(u => u.UserName);
         }
     }
 }

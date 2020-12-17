@@ -5,11 +5,12 @@ namespace WebApplication.Database.Models
 {
     public class Account
     {
-        public Guid Id { get; set; }
-        
-        public Guid UserId { get; set; }
+        public string UserMail { get; set; }
 
-        /*public User User { get; set; }
-        public List<CurrencyUser> Currencies { get; set; }*/
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        public byte Role { get; set; }
     }
 }

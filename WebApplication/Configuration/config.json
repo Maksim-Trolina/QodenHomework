@@ -1,5 +1,5 @@
 {
   "Database": {
-    "ConnectionString": "User ID=Maksim;Password=red200110;Host=localhost;Port=5432;Database=postgres;Pooling=true;MaxPoolSize=100;"
+    "ConnectionString": "User ID=Maksim;Password=red200110;Host=localhost;Port=5432;Database=My;Pooling=true;MaxPoolSize=100;"
   }
 }
