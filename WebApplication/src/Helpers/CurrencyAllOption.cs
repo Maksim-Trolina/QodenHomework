@@ -1,6 +1,6 @@
 namespace WebApplication.Helpers
 {
-    public enum CurrencyAllOptions
+    public enum CurrencyAllOption
     {
         InputCommission = 0,
         InputCommissionUser = 1,

@@ -87,9 +87,9 @@ namespace WebApplication.Controllers
         [Route("delete/account")]
         public async Task Delete(string name)
         {
-            Roles role = (Roles)(await db.GetRole(User.Identity.Name));
+            Role role = (Role)(await db.GetRole(User.Identity.Name));
 
-            if (role == Roles.Admin && User.Identity.Name!=name)
+            if (role == Role.Admin && User.Identity.Name!=name)
             {
                 await db.DeleteAccount(name);
 
@@ -123,7 +123,7 @@ namespace WebApplication.Controllers
             await Logout();
         }
         
-        
+        [Authorize]
         [Route("input/money")]
         public async Task InputMoney(string name,string currencyName,decimal value)
         {
@@ -183,7 +183,7 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
                 await db.AddCurrencyAll(currency);
 
@@ -197,7 +197,7 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte)Roles.Admin)
+            if (role == (byte)Role.Admin)
             {
                 await db.DeleteCurrency(currency);
 
@@ -211,9 +211,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.InputCommission);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.InputCommission);
 
                 await db.Save();
             }
@@ -225,9 +225,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.InputLimit);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.InputLimit);
 
                 await db.Save();
             }
@@ -239,9 +239,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinInput);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinInput);
 
                 await db.Save();
             }
@@ -253,9 +253,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.OutputCommission);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.OutputCommission);
 
                 await db.Save();
             }
@@ -267,9 +267,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.OutputLimit);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.OutputLimit);
 
                 await db.Save();
             }
@@ -281,9 +281,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinOutput);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinOutput);
 
                 await db.Save();
             }
@@ -295,9 +295,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.TransferCommission);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.TransferCommission);
 
                 await db.Save();
             }
@@ -309,9 +309,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.TransferLimit);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.TransferLimit);
 
                 await db.Save();
             }
@@ -323,9 +323,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinTransfer);
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinTransfer);
 
                 await db.Save();
             }
@@ -337,9 +337,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.InputCommissionUser);
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.InputCommissionUser);
 
                 await db.Save();
             }
@@ -351,9 +351,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.OutputCommissionUser);
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.OutputCommissionUser);
 
                 await db.Save();
             }
@@ -365,9 +365,9 @@ namespace WebApplication.Controllers
         {
             byte role = await db.GetRole(User.Identity.Name);
 
-            if (role == (byte) Roles.Admin)
+            if (role == (byte) Role.Admin)
             {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.TransferCommissionUser);
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.TransferCommissionUser);
 
                 await db.Save();
             }

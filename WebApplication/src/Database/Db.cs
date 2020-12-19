@@ -21,6 +21,8 @@ namespace WebApplication.Database
         public DbSet<CurrencyUser> CurrencyUsers { get; set; }
 
         public DbSet<CurrencyAccount> CurrencyAccounts { get; set; }
+        
+        public DbSet<BigOperation> BigOperations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,13 +44,16 @@ namespace WebApplication.Database
 
             modelBuilder.Entity<CurrencyAccount>()
                 .HasKey(u => u.Id);
+
+            modelBuilder.Entity<BigOperation>()
+                .HasKey(u => u.Id);
         }
 
         private void CreateDefaultUsers(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>()
                 .HasData(new Account
-                    {UserMail = "Admin", AccountName = "Admin", Password = "Admin", Role = (byte) Roles.Admin});
+                    {UserMail = "Admin", AccountName = "Admin", Password = "Admin", Role = (byte) Role.Admin});
 
             modelBuilder.Entity<CurrencyAll>()
                 .HasData(new CurrencyAll {CurrencyName = "USD",InputCommision = (decimal)0.2});

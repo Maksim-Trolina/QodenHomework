@@ -18,11 +18,18 @@ namespace WebApplication.Services
         public async Task InputMoney(string mail, decimal value,CurrencyAccount currencyAccount,string name,CurrencyAll currencyAll)
         {
             byte role = await db.GetRole(name);
-            if (role == (byte) Roles.User && currencyAll.MinInput<=value)
+            if (role == (byte) Role.User && currencyAll.MinInput<=value)
             {
-                CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
+                if (currencyAll.InputLimit >= value)
+                {
+                    CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
 
-                currencyAccount.Count += value * (1 - currencyUser.InputCommision);
+                    currencyAccount.Count += value * (1 - currencyUser.InputCommision);
+                }
+                else
+                {
+                    
+                }
             }
             else
             {
@@ -38,11 +45,18 @@ namespace WebApplication.Services
 
             string mailAccount = await db.GetMail(currencyAccount.AccountName);
 
-            if (role == (byte) Roles.User && currencyAccount.Count>=value && currencyAll.MinOutput<=value && mailAccount == mailCurrent)
+            if (role == (byte) Role.User && currencyAccount.Count>=value && currencyAll.MinOutput<=value && mailAccount == mailCurrent)
             {
-                CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
+                if (value <= currencyAll.OutputLimit)
+                {
+                    CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
 
-                currencyAccount.Count -= value * (1 - currencyUser.OutputCommision);
+                    currencyAccount.Count -= value * (1 - currencyUser.OutputCommision);
+                }
+                else
+                {
+                    
+                }
             }
             else
             {
@@ -57,13 +71,20 @@ namespace WebApplication.Services
 
             CurrencyAccount account = await db.GetCurrencyAccount(name, currencyAll.CurrencyName);
 
-            if (role == (byte) Roles.User && account.Count >= value && currencyAll.MinTransfer <= value)
+            if (role == (byte) Role.User && account.Count >= value && currencyAll.MinTransfer <= value)
             {
-                CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
+                if (currencyAll.TransferLimit >= value)
+                {
+                    CurrencyUser currencyUser = await db.GetCurrencyUser(mail, currencyAccount.CurrencyName);
 
-                currencyAccount.Count += value * (1 - currencyUser.TransferCommision);
+                    currencyAccount.Count += value * (1 - currencyUser.TransferCommision);
 
-                account.Count -= value;
+                    account.Count -= value;
+                }
+                else
+                {
+                    
+                }
             }
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApplication.Database;
@@ -9,9 +10,10 @@ using WebApplication.Database;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20201219045910_004")]
+    partial class _004
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,29 +76,6 @@ namespace WebApplication.Migrations
                             Role = (byte)0,
                             UserMail = "Admin"
                         });
-                });
-
-            modelBuilder.Entity("WebApplication.Database.Models.BigOperation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("FromAccountName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ToAccountName")
-                        .HasColumnType("text");
-
-                    b.Property<byte>("TypeOperation")
-                        .HasColumnType("smallint");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BigOperations");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.CurrencyAccount", b =>

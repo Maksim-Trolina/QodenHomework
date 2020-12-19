@@ -37,7 +37,7 @@ namespace WebApplication.Services
                 UserMail = mail,
                 AccountName = name,
                 Password = password,
-                Role = (byte) Roles.User
+                Role = (byte) Role.User
             });
 
             await AddCurrenciesAccount(name);
@@ -191,71 +191,71 @@ namespace WebApplication.Services
             db.CurrencyAlls.Remove(currencyAll);
         }
 
-        public async Task ChangeCurrencyAllOption(string currency, decimal value,CurrencyAllOptions currencyAllOptions)
+        public async Task ChangeCurrencyAllOption(string currency, decimal value,CurrencyAllOption currencyAllOption)
         {
             CurrencyAll currencyAll = await db.CurrencyAlls.FirstOrDefaultAsync(x => x.CurrencyName == currency);
             IEnumerable<CurrencyUser> currencyUsers = db.CurrencyUsers.Where(x => x.CurrencyName == currency &&
                 !x.IsUniqueCommision);
             
-            switch (currencyAllOptions)
+            switch (currencyAllOption)
             {
-                case CurrencyAllOptions.InputCommission:
+                case CurrencyAllOption.InputCommission:
                     currencyAll.InputCommision = value;
                     foreach (var currencyUser in  currencyUsers)
                     {
                         currencyUser.InputCommision = value;
                     }
                     break;
-                case CurrencyAllOptions.InputLimit:
+                case CurrencyAllOption.InputLimit:
                     currencyAll.InputLimit = value;
                     break;
-                case CurrencyAllOptions.MinInput:
+                case CurrencyAllOption.MinInput:
                     currencyAll.MinInput = value;
                     break;
-                case CurrencyAllOptions.OutputCommission:
+                case CurrencyAllOption.OutputCommission:
                     currencyAll.OutputCommision = value;
                     foreach (var currencyUser in currencyUsers)
                     {
                         currencyUser.OutputCommision = value;
                     }
                     break;
-                case CurrencyAllOptions.OutputLimit:
+                case CurrencyAllOption.OutputLimit:
                     currencyAll.OutputLimit = value;
                     break;
-                case CurrencyAllOptions.MinOutput:
+                case CurrencyAllOption.MinOutput:
                     currencyAll.MinOutput = value;
                     break;
-                case CurrencyAllOptions.TransferCommission:
+                case CurrencyAllOption.TransferCommission:
                     currencyAll.TransferCommision = value;
                     foreach (var currencyUser in currencyUsers)
                     {
                         currencyUser.TransferCommision = value;
                     }
                     break;
-                case CurrencyAllOptions.TransferLimit:
+                case CurrencyAllOption.TransferLimit:
                     currencyAll.TransferLimit = value;
                     break;
-                case CurrencyAllOptions.MinTransfer:
+                case CurrencyAllOption.MinTransfer:
                     currencyAll.MinTransfer = value;
                     break;
             }
         }
 
-        public async Task ChangeCurrencyAllOption(string mail,string currency, decimal value, CurrencyAllOptions currencyAllOptions)
+        public async Task ChangeCurrencyAllOption(string mail,string currency, decimal value, CurrencyAllOption currencyAllOption)
         {
             CurrencyUser currencyUser = await db.CurrencyUsers.FirstOrDefaultAsync(x => x.Mail == mail &&
                                                                                     x.CurrencyName == currency);
             currencyUser.IsUniqueCommision = true;
 
-            switch (currencyAllOptions)
+            switch (currencyAllOption)
             {
-                case CurrencyAllOptions.InputCommissionUser:
+                case CurrencyAllOption.InputCommissionUser:
                     currencyUser.InputCommision = value;
                     break;
-                case CurrencyAllOptions.OutputCommissionUser:
+                case CurrencyAllOption.OutputCommissionUser:
                     currencyUser.OutputCommision = value;
                     break;
-                case CurrencyAllOptions.TransferCommissionUser:
+                case CurrencyAllOption.TransferCommissionUser:
                     currencyUser.TransferCommision = value;
                     break;
             }
