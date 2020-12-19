@@ -10,6 +10,8 @@ namespace WebApplication.Database.Models
 
         public string ToAccountName { get; set; }
 
+        public string Currency { get; set; }
+
         public decimal Value { get; set; }
 
         public byte TypeOperation { get; set; }

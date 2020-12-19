@@ -65,6 +65,29 @@ namespace WebApplication.Services
             await AddCurrenciesUser(mail);
         }
 
+        public async Task AddBigOperation(string toAccName, decimal value,
+            TypeOperation operation,string currency,string fromAccName=null)
+        {
+            await db.BigOperations.AddAsync(new BigOperation
+            {
+                ToAccountName = toAccName,
+                FromAccountName = fromAccName,
+                Value = value,
+                TypeOperation = (byte) operation,
+                Currency = currency
+            });
+        }
+
+        public async Task<BigOperation> GetBigOperation(Guid id)
+        {
+           return await db.BigOperations.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public void DeleteBigOperation(BigOperation bigOperation)
+        {
+            db.BigOperations.Remove(bigOperation);
+        }
+
         private async Task AddCurrencyAccount(string name,string currency)
         {
             CurrencyAccount currencyAccount = new CurrencyAccount

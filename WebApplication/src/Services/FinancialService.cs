@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using WebApplication.Database;
 using WebApplication.Database.Models;
@@ -28,13 +29,48 @@ namespace WebApplication.Services
                 }
                 else
                 {
-                    
+                    await db.AddBigOperation(currencyAccount.AccountName, value, TypeOperation.Input,currencyAll.CurrencyName);
+
+                    await db.Save();
                 }
             }
             else
             {
                 currencyAccount.Count += value;
             }
+        }
+        
+
+        public async Task BigMoneyOperation(Guid id)
+        {
+            BigOperation bigOperation = await db.GetBigOperation(id);
+
+            string mail = await db.GetMail(bigOperation.ToAccountName);
+
+            CurrencyAccount currencyAccount =
+                await db.GetCurrencyAccount(bigOperation.ToAccountName, bigOperation.Currency);
+
+            CurrencyUser currencyUser = await db.GetCurrencyUser(mail, bigOperation.Currency);
+
+            switch (bigOperation.TypeOperation)
+            {
+                case (byte)TypeOperation.Input:
+                    currencyAccount.Count += bigOperation.Value * (1 - currencyUser.InputCommision);
+                    break;
+                case (byte)TypeOperation.Output:
+                    currencyAccount.Count -= bigOperation.Value * (1 - currencyUser.OutputCommision);
+                    break;
+                case (byte)TypeOperation.Transfer:
+                    CurrencyAccount currencyAccountFrom =
+                        await db.GetCurrencyAccount(bigOperation.FromAccountName, bigOperation.Currency);
+                    currencyAccountFrom.Count -= bigOperation.Value;
+                    currencyAccount.Count += bigOperation.Value * (1 - currencyUser.TransferCommision);
+                    break;
+            }
+            
+            db.DeleteBigOperation(bigOperation);
+
+            await db.Save();
         }
 
         public async Task OutputMoney(string mail,decimal value,CurrencyAccount currencyAccount,string name,CurrencyAll currencyAll)
@@ -55,7 +91,9 @@ namespace WebApplication.Services
                 }
                 else
                 {
-                    
+                    await db.AddBigOperation(currencyAccount.AccountName, value, TypeOperation.Output,currencyAll.CurrencyName);
+
+                    await db.Save();
                 }
             }
             else
@@ -83,7 +121,9 @@ namespace WebApplication.Services
                 }
                 else
                 {
-                    
+                    await db.AddBigOperation(currencyAccount.AccountName, value, TypeOperation.Transfer,currencyAll.CurrencyName,account.AccountName);
+
+                    await db.Save();
                 }
             }
         }

@@ -372,117 +372,19 @@ namespace WebApplication.Controllers
                 await db.Save();
             }
         }
-        
-
-        /*
-        [Authorize]
-        [Route("currency/delete")]
-        public async Task DeleteCurrency(string currency)
-        {
-            await userDb.DeleteCurrency(currency, User.Identity.Name);
-        }
 
         [Authorize]
-        [Route("currency/add")]
-        public async Task AddCurrency(string currency, decimal coast)
+        [Route("confirm")]
+        public async Task ConfirmInput(Guid id)
         {
-            await userDb.AddCurrency(currency, User.Identity.Name, coast);
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Role.Admin)
+            {
+                await finService.BigMoneyOperation(id);
+            }
         }
 
-        [Authorize]
-        [Route("money/transfer")]
-        public async Task TransferMoney(string currency, decimal value, string accountId)
-        {
-            await userDb.TransferMoney(currency, value, accountId, User.Identity.Name);
-        }
-
-        [Authorize]
-        [Route("set/commission/transfer/all")]
-        public async Task SetCommissionTransfer(string currency,decimal commission)
-        {
-            await userDb.SetCommissionTransferAll(currency, commission, User.Identity.Name);
-        }
-
-        [Authorize]
-        [Route("set/commission/transfer")]
-        public async Task SetCommissionTransfer(string currency, decimal commission, string userId)
-        {
-            await userDb.SetCommissionTransferUser(currency, commission, userId, User.Identity.Name);
-        }
-
-        [Authorize]
-        [Route("set/limit/transfer/all")]
-        public async Task SetLimitTransfer(string currency, decimal limit)
-        {
-            await userDb.SetLimitTransferAll(currency, limit, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/limit/transfer")]
-        public async Task SetLimitTransfer(string currency, decimal commission, string userId)
-        {
-            await userDb.SetLimitTransfer(currency, commission, userId, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/limit/input/all")]
-        public async Task SetLimitInput(string currency, decimal limit)
-        {
-            await userDb.SetLimitInputAll(currency, limit, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/limit/input")]
-        public async Task SetLimitInput(string currency, decimal commission, string userId)
-        {
-            await userDb.SetLimitInput(currency, commission, userId, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/limit/output/all")]
-        public async Task SetLimitOutput(string currency, decimal limit)
-        {
-            await userDb.SetLimitOutputAll(currency, limit, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/limit/output")]
-        public async Task SetLimitOutput(string currency, decimal commission, string userId)
-        {
-            await userDb.SetLimitOutput(currency, commission, userId, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/commission/input/all")]
-        public async Task SetCommissionInput(string currency, decimal limit)
-        {
-            await userDb.SetCommissionInputAll(currency, limit, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/commission/input")]
-        public async Task SetCommissionInput(string currency, decimal commission, string userId)
-        {
-            await userDb.SetCommissionInput(currency, commission, userId, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/commission/output/all")]
-        public async Task SetCommissionOutput(string currency, decimal limit)
-        {
-            await userDb.SetCommissionOutputAll(currency, limit, User.Identity.Name);
-        }
-        
-        [Authorize]
-        [Route("set/commission/output")]
-        public async Task SetCommissionOutput(string currency, decimal commission, string userId)
-        {
-            await userDb.SetCommissionOutput(currency, commission, userId, User.Identity.Name);
-        }
-        */
-        
-        
-        
         private async Task Authenticate(string userId)
         {
             var claims = new List<Claim>
