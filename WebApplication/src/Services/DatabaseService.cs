@@ -48,7 +48,7 @@ namespace WebApplication.Services
             await db.SaveChangesAsync();
         }
 
-        public async Task AddCurrenciesAccount(string name)
+        private async Task AddCurrenciesAccount(string name)
         {
             IEnumerable<CurrencyAll> currencyAlls = db.CurrencyAlls;
 
@@ -94,7 +94,7 @@ namespace WebApplication.Services
             await db.CurrencyUsers.AddAsync(currencyUser);
         }
 
-        public async Task AddCurrenciesUser(string mail)
+        private async Task AddCurrenciesUser(string mail)
         {
             List<CurrencyAll> currencyAlls = db.CurrencyAlls.ToList();
 
@@ -102,6 +102,31 @@ namespace WebApplication.Services
             {
                 await AddCurrencyUser(mail, currencyAll);
             }
+        }
+
+        public async Task AddCurrencyAll(string currency)
+        {
+            CurrencyAll currencyAll = new CurrencyAll
+            {
+                CurrencyName = currency
+            };
+            
+            await db.CurrencyAlls.AddAsync(currencyAll);
+
+            IEnumerable<string> mails = db.CurrencyUsers.Select(x => x.Mail).Distinct();
+
+            foreach (var email in mails)
+            {
+                await AddCurrencyUser(email, currencyAll);
+            }
+
+            IEnumerable<CurrencyAccount> currencyAccounts = db.CurrencyAccounts;
+
+            foreach (var currencyAccount in currencyAccounts)
+            {
+                await AddCurrencyAccount(currencyAccount.AccountName, currency);
+            }
+
         }
 
         public async Task<string> GetMail(string name)
@@ -137,7 +162,7 @@ namespace WebApplication.Services
 
         public async Task DeleteAccount(string name)
         {
-            DeteleCurrencyAccount(name);
+            DeleteCurrencyAccount(name);
             
             Account account = await db.Accounts.FirstOrDefaultAsync(u => u.AccountName == name);
 
@@ -149,6 +174,91 @@ namespace WebApplication.Services
             await DeleteAccounts(mail);
             
             DeleteCurrencyUser(mail);
+        }
+
+        public async Task DeleteCurrency(string currency)
+        {
+            IEnumerable<CurrencyUser> currencyUsers = db.CurrencyUsers.Where(x => x.CurrencyName == currency);
+
+            IEnumerable<CurrencyAccount> currencyAccounts = db.CurrencyAccounts.Where(x => x.CurrencyName == currency);
+
+            CurrencyAll currencyAll = await db.CurrencyAlls.FirstOrDefaultAsync(x => x.CurrencyName == currency);
+
+            db.CurrencyUsers.RemoveRange(currencyUsers);
+            
+            db.CurrencyAccounts.RemoveRange(currencyAccounts);
+
+            db.CurrencyAlls.Remove(currencyAll);
+        }
+
+        public async Task ChangeCurrencyAllOption(string currency, decimal value,CurrencyAllOptions currencyAllOptions)
+        {
+            CurrencyAll currencyAll = await db.CurrencyAlls.FirstOrDefaultAsync(x => x.CurrencyName == currency);
+            IEnumerable<CurrencyUser> currencyUsers = db.CurrencyUsers.Where(x => x.CurrencyName == currency &&
+                !x.IsUniqueCommision);
+            
+            switch (currencyAllOptions)
+            {
+                case CurrencyAllOptions.InputCommission:
+                    currencyAll.InputCommision = value;
+                    foreach (var currencyUser in  currencyUsers)
+                    {
+                        currencyUser.InputCommision = value;
+                    }
+                    break;
+                case CurrencyAllOptions.InputLimit:
+                    currencyAll.InputLimit = value;
+                    break;
+                case CurrencyAllOptions.MinInput:
+                    currencyAll.MinInput = value;
+                    break;
+                case CurrencyAllOptions.OutputCommission:
+                    currencyAll.OutputCommision = value;
+                    foreach (var currencyUser in currencyUsers)
+                    {
+                        currencyUser.OutputCommision = value;
+                    }
+                    break;
+                case CurrencyAllOptions.OutputLimit:
+                    currencyAll.OutputLimit = value;
+                    break;
+                case CurrencyAllOptions.MinOutput:
+                    currencyAll.MinOutput = value;
+                    break;
+                case CurrencyAllOptions.TransferCommission:
+                    currencyAll.TransferCommision = value;
+                    foreach (var currencyUser in currencyUsers)
+                    {
+                        currencyUser.TransferCommision = value;
+                    }
+                    break;
+                case CurrencyAllOptions.TransferLimit:
+                    currencyAll.TransferLimit = value;
+                    break;
+                case CurrencyAllOptions.MinTransfer:
+                    currencyAll.MinTransfer = value;
+                    break;
+            }
+        }
+
+        public async Task ChangeCurrencyAllOption(string mail,string currency, decimal value, CurrencyAllOptions currencyAllOptions)
+        {
+            CurrencyUser currencyUser = await db.CurrencyUsers.FirstOrDefaultAsync(x => x.Mail == mail &&
+                                                                                    x.CurrencyName == currency);
+            currencyUser.IsUniqueCommision = true;
+
+            switch (currencyAllOptions)
+            {
+                case CurrencyAllOptions.InputCommissionUser:
+                    currencyUser.InputCommision = value;
+                    break;
+                case CurrencyAllOptions.OutputCommissionUser:
+                    currencyUser.OutputCommision = value;
+                    break;
+                case CurrencyAllOptions.TransferCommissionUser:
+                    currencyUser.TransferCommision = value;
+                    break;
+            }
         }
 
         private async Task DeleteAccounts(string mail)
@@ -168,7 +278,7 @@ namespace WebApplication.Services
             db.CurrencyUsers.RemoveRange(currencyUsers);
         }
 
-        private void DeteleCurrencyAccount(string name)
+        private void DeleteCurrencyAccount(string name)
         {
             IEnumerable<CurrencyAccount> currencyAccounts = db.CurrencyAccounts.Where(u => u.AccountName == name);
             

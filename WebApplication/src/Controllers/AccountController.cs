@@ -176,6 +176,202 @@ namespace WebApplication.Controllers
                 await db.Save();
             }
         }
+
+        [Authorize]
+        [Route("add/currency")]
+        public async Task AddCurrency(string currency)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.AddCurrencyAll(currency);
+
+                await db.Save();
+            }
+        }
+
+        [Authorize]
+        [Route("delete/currency")]
+        public async Task DeleteCurrency(string currency)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte)Roles.Admin)
+            {
+                await db.DeleteCurrency(currency);
+
+                await db.Save();
+            }
+        }
+
+        [Authorize]
+        [Route("change/input/commission")]
+        public async Task ChangeInputCommission(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.InputCommission);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/input/limit")]
+        public async Task ChangeInputLimit(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.InputLimit);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/input/min")]
+        public async Task ChangeInputMin(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinInput);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/output/commission")]
+        public async Task ChangeOutputCommission(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.OutputCommission);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/output/limit")]
+        public async Task ChangeOutputLimit(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.OutputLimit);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/output/min")]
+        public async Task ChangeOutputMin(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinOutput);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/transfer/commission")]
+        public async Task ChangeTransferCommission(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.TransferCommission);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/transfer/limit")]
+        public async Task ChangeTransferLimit(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.TransferLimit);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/transfer/min")]
+        public async Task ChangeTransferMin(string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOptions.MinTransfer);
+
+                await db.Save();
+            }
+        }
+
+        [Authorize]
+        [Route("change/user/input/commission")]
+        public async Task ChangeInputCommission(string mail, string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.InputCommissionUser);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/user/output/commission")]
+        public async Task ChangeOutputCommission(string mail, string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.OutputCommissionUser);
+
+                await db.Save();
+            }
+        }
+        
+        [Authorize]
+        [Route("change/user/transfer/commission")]
+        public async Task ChangeTransferCommission(string mail, string currency, decimal commission)
+        {
+            byte role = await db.GetRole(User.Identity.Name);
+
+            if (role == (byte) Roles.Admin)
+            {
+                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOptions.TransferCommissionUser);
+
+                await db.Save();
+            }
+        }
         
 
         /*
