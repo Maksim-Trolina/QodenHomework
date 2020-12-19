@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database;
 using WebApplication.Database.Models;
+using WebApplication.Helpers;
 using WebApplication.Services;
 
 namespace WebApplication.Controllers
@@ -17,70 +18,167 @@ namespace WebApplication.Controllers
     [Route("api")]
     public class AccountController : ControllerBase
     {
-        
-        
-        /*
-        /*[Route("login")]
-        public async Task<string> Login(string userName,string password)
+
+        private DatabaseService db;
+
+        private FinancialService finService;
+
+        public AccountController(DatabaseService db,FinancialService financialService)
         {
-            User user = await userDb.GetUser(userName, password);
+            this.db = db;
 
-            if (user != null)
+            finService = financialService;
+        }
+        
+        [Route("login")]
+        public async Task Login(string mail, string name, string password)
+        {
+            Account account = await db.GetAccount(mail, name, password);
+
+            if (account != null)
             {
-                await Authenticate(user.Id.ToString());
-
-                return "Вы вошли в систему";
-                
+                await Authenticate(name);
             }
-
-            return "Вы не вошли в систему";
-
-        }#1#
+        }
 
         [Authorize]
         [Route("logout")]
-        public async Task<string> Logout()
+        public async Task Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            return "Вы вышли из системы";
         }
-        
-        /*[Route("register")]
-        public async Task<string> Register(string userName,string password)
+
+        [Route("register/user")]
+        public async Task Register(string mail, string name, string password)
         {
-            User user = await userDb.GetUser(userName, password);
+            Account account = await db.GetAccount(name);
 
-            if (user == null)
+            if (account == null)
             {
-                /*int id = await userDb.GetLastId();#2#
+                await db.AddUser(mail, name, password);
 
-                user = await userDb.AddUser(userName, password);
+                await db.Save();
 
-                await Authenticate(user.Id.ToString());
-
-                return "Вы зарегистрировались в системе";
+                await Authenticate(name);
             }
-
-            return "Вы не зарегистрировались в системе";
-        }#1#
+        }
 
         [Authorize]
         [Route("register/account")]
-        public async Task<string> RegisterAccount()
+        public async Task Register(string name, string password)
         {
-            var account = await userDb.AddAccount(User.Identity.Name);
+            Account account = await db.GetAccount(name);
 
-            return account.UserId.ToString();
+            if (account == null)
+            {
+                string mail = await db.GetMail(User.Identity.Name);
+
+                await db.AddAccount(mail, name, password);
+
+                await db.Save();
+
+                await Logout();
+                
+                await Authenticate(name);
+            }
         }
 
         [Authorize]
-        [Route("account/put")]
-        public async Task AddMoney(string currency, decimal value,string accountId)
+        [Route("delete/account")]
+        public async Task Delete(string name)
         {
-            await userDb.AddMoney(currency, value, accountId,User.Identity.Name);
+            Roles role = (Roles)(await db.GetRole(User.Identity.Name));
+
+            if (role == Roles.Admin && User.Identity.Name!=name)
+            {
+                await db.DeleteAccount(name);
+
+                await db.Save();
+            }
+            else
+            {
+                string mailCurrent = await db.GetMail(User.Identity.Name);
+
+                string mailDelete = await db.GetMail(name);
+
+                if (mailCurrent == mailDelete && User.Identity.Name!=name)
+                {
+                    await db.DeleteAccount(name);
+
+                    await db.Save();
+                }
+            }
         }
 
+        [Authorize]
+        [Route("delete/user")]
+        public async Task Delete()
+        {
+            string mail = await db.GetMail(User.Identity.Name);
+
+            await db.DeleteUser(mail);
+
+            await db.Save();
+
+            await Logout();
+        }
+        
+        
+        [Route("input/money")]
+        public async Task InputMoney(string name,string currencyName,decimal value)
+        {
+            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
+
+            if (currencyAccount != null)
+            {
+                string mail = await db.GetMail(name);
+                
+                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
+
+                await finService.InputMoney(mail, value, currencyAccount,User.Identity.Name,currencyAll);
+
+                await db.Save();
+            }
+        }
+
+        [Authorize]
+        [Route("output/money")]
+        public async Task OutputMoney(string name, string currencyName, decimal value)
+        {
+            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
+
+            if (currencyAccount != null)
+            {
+                string mail = await db.GetMail(name);
+                
+                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
+
+                await finService.OutputMoney(mail, value, currencyAccount, User.Identity.Name,currencyAll);
+
+                await db.Save();
+            }
+        }
+
+        [Authorize]
+        [Route("transfer/money")]
+        public async Task TransferMoney(string name, string currencyName, decimal value)
+        {
+            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
+
+            if (currencyAccount != null)
+            {
+                string mail = await db.GetMail(name);
+                
+                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
+
+                await finService.TransferMoney(mail, value, currencyAccount, User.Identity.Name, currencyAll);
+
+                await db.Save();
+            }
+        }
+        
+
+        /*
         [Authorize]
         [Route("currency/delete")]
         public async Task DeleteCurrency(string currency)
@@ -185,6 +283,7 @@ namespace WebApplication.Controllers
         {
             await userDb.SetCommissionOutput(currency, commission, userId, User.Identity.Name);
         }
+        */
         
         
         
@@ -198,6 +297,6 @@ namespace WebApplication.Controllers
             ClaimsIdentity id = new ClaimsIdentity(claims,"ApplicationCookie",ClaimsIdentity.DefaultNameClaimType,ClaimsIdentity.DefaultRoleClaimType);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }*/
+        }
     }
 }

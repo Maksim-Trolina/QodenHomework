@@ -31,7 +31,9 @@ namespace WebApplication
             
             services.AddMvc();
 
-            services.AddScoped<IFinancialService, FinancialService>();
+            services.AddScoped<DatabaseService>();
+
+            services.AddScoped<FinancialService>();
 
             ConfigureDatabase(services);
         }

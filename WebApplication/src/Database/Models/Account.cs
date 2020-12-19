@@ -7,7 +7,7 @@ namespace WebApplication.Database.Models
     {
         public string UserMail { get; set; }
 
-        public string UserName { get; set; }
+        public string AccountName { get; set; }
 
         public string Password { get; set; }
 
