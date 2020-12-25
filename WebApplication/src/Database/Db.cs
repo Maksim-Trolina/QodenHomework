@@ -13,16 +13,22 @@ namespace WebApplication.Database
         {
 
         }
-        
+
+        public DbSet<User> Users { get; set; }
+
         public DbSet<Account> Accounts { get; set; }
 
-        public DbSet<CurrencyAll> CurrencyAlls { get; set; }
-        
-        public DbSet<CurrencyUser> CurrencyUsers { get; set; }
+        public DbSet<AccountCurrency> AccountCurrencies { get; set; }
 
-        public DbSet<CurrencyAccount> CurrencyAccounts { get; set; }
-        
-        public DbSet<BigOperation> BigOperations { get; set; }
+        public DbSet<CurrencyInformation> CurrencyInformations { get; set; }
+
+        public DbSet<Operation> Operations { get; set; }
+
+        public DbSet<UserDepositCommission> UserDepositCommissions { get; set; }
+
+        public DbSet<UserWithdrawCommission> UserWithdrawCommissions { get; set; }
+
+        public DbSet<UserTransferCommission> UserTransferCommissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,7 +39,7 @@ namespace WebApplication.Database
 
         private void SetInternalKeys(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>()
+            /*modelBuilder.Entity<Account>()
                 .HasKey(u => u.AccountName);
 
             modelBuilder.Entity<CurrencyAll>()
@@ -46,17 +52,30 @@ namespace WebApplication.Database
                 .HasKey(u => u.Id);
 
             modelBuilder.Entity<BigOperation>()
-                .HasKey(u => u.Id);
+                .HasKey(u => u.Id);*/
         }
 
         private void CreateDefaultUsers(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>()
-                .HasData(new Account
-                    {UserMail = "Admin", AccountName = "Admin", Password = "Admin", Role = (byte) Role.Admin});
+            User admin = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = "Admin@com",
+                Role = "Admin"
+            };
 
-            modelBuilder.Entity<CurrencyAll>()
-                .HasData(new CurrencyAll {CurrencyName = "USD",InputCommision = (decimal)0.2});
+            Account account = new Account
+            {
+                Id = Guid.NewGuid(),
+                UserId = admin.Id,
+                Name = "Admin",
+                Password = "Admin"
+            };
+
+            admin.Accounts = new List<Account> {account};
+
+            modelBuilder.Entity<User>()
+                .HasData(admin);
         }
     }
 }

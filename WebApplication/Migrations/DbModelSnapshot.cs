@@ -82,7 +82,7 @@ namespace WebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Currency")
+                    b.Property<string>("AccountCurrency")
                         .HasColumnType("text");
 
                     b.Property<string>("FromAccountName")

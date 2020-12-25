@@ -2,14 +2,14 @@ using System;
 
 namespace WebApplication.Database.Models
 {
-    public class CurrencyAccount
+    public class UserDepositCommission
     {
         public Guid Id { get; set; }
+
+        public Guid UserId { get; set; }
         
         public string CurrencyName { get; set; }
 
-        public decimal Count { get; set; }
-
-        public string AccountName { get; set; }
+        public decimal Commission { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace WebApplication.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Currency",
+                name: "AccountCurrency",
                 table: "BigOperations",
                 type: "text",
                 nullable: true);
@@ -16,7 +16,7 @@ namespace WebApplication.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Currency",
+                name: "AccountCurrency",
                 table: "BigOperations");
         }
     }
