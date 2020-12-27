@@ -20,15 +20,11 @@ namespace WebApplication.Database
 
         public DbSet<AccountCurrency> AccountCurrencies { get; set; }
 
-        public DbSet<CurrencyInformation> CurrencyInformations { get; set; }
+        public DbSet<CurrencyInformation> CurrencyInformation { get; set; }
 
         public DbSet<Operation> Operations { get; set; }
 
-        public DbSet<UserDepositCommission> UserDepositCommissions { get; set; }
-
-        public DbSet<UserWithdrawCommission> UserWithdrawCommissions { get; set; }
-
-        public DbSet<UserTransferCommission> UserTransferCommissions { get; set; }
+        public DbSet<UserCommission> UserCommissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,20 +35,35 @@ namespace WebApplication.Database
 
         private void SetInternalKeys(ModelBuilder modelBuilder)
         {
-            /*modelBuilder.Entity<Account>()
-                .HasKey(u => u.AccountName);
+            modelBuilder.Entity<CurrencyInformation>()
+                .HasKey(x => x.Name);
+        }
 
-            modelBuilder.Entity<CurrencyAll>()
-                .HasKey(u => u.CurrencyName);
+        private void SetRelations(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Account>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Accounts)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<CurrencyUser>()
-                .HasKey(u => u.Id);
+            modelBuilder.Entity<UserCommission>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.UserCommissions)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<CurrencyAccount>()
-                .HasKey(u => u.Id);
+            modelBuilder.Entity<AccountCurrency>()
+                .HasOne(x => x.Account)
+                .WithMany(x => x.AccountCurrencies)
+                .HasForeignKey(x => x.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<BigOperation>()
-                .HasKey(u => u.Id);*/
+            modelBuilder.Entity<Operation>()
+                .HasOne(x => x.FromAccount)
+                .WithMany(x => x.Operations)
+                .HasForeignKey(x => x.FromAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void CreateDefaultUsers(ModelBuilder modelBuilder)
@@ -61,7 +72,8 @@ namespace WebApplication.Database
             {
                 Id = Guid.NewGuid(),
                 Email = "Admin@com",
-                Role = "Admin"
+                Role = Role.Admin,
+                RegistrationDate = DateTime.Now
             };
 
             Account account = new Account
@@ -69,13 +81,15 @@ namespace WebApplication.Database
                 Id = Guid.NewGuid(),
                 UserId = admin.Id,
                 Name = "Admin",
-                Password = "Admin"
+                Password = "Admin",
+                RegistrationDate = DateTime.Now
             };
-
-            admin.Accounts = new List<Account> {account};
 
             modelBuilder.Entity<User>()
                 .HasData(admin);
+
+            modelBuilder.Entity<Account>()
+                .HasData(account);
         }
     }
 }

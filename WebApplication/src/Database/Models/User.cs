@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using WebApplication.Helpers;
 
 namespace WebApplication.Database.Models
 {
@@ -9,14 +10,13 @@ namespace WebApplication.Database.Models
 
         public string Email { get; set; }
 
-        public string Role { get; set; }
+        public Role Role { get; set; }
+        
+        public DateTime RegistrationDate { get; set; }
 
         public List<Account> Accounts { get; set; }
 
-        public List<UserDepositCommission> UserDepositCommissions { get; set; }
-
-        public List<UserWithdrawCommission> UserWithdrawCommissions { get; set; }
-
-        public List<UserTransferCommission> UserTransferCommissions { get; set; }
+        public List<UserCommission> UserCommissions { get; set; }
+        
     }
 }
