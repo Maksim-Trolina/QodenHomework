@@ -12,6 +12,8 @@ namespace WebApplication.Database.Models
 
         public string CurrencyName { get; set; }
 
+        public CurrencyInformation CurrencyInformation { get; set; }
+
         public decimal Value { get; set; }
     }
 }

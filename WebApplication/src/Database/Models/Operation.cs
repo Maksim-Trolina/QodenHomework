@@ -19,9 +19,11 @@ namespace WebApplication.Database.Models
 
         public string CurrencyName { get; set; }
 
+        public CurrencyInformation CurrencyInformation { get; set; }
+
         public decimal Value { get; set; }
 
-        public bool Status { get; set; }
+        public StatusOperation Status { get; set; }
 
         public DateTime Date { get; set; }
     }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace WebApplication.Database.Models
 {
     public class CurrencyInformation
@@ -15,6 +17,11 @@ namespace WebApplication.Database.Models
         public decimal WithdrawLimit { get; set; }
 
         public decimal TransferLimit { get; set; }
-        
+
+        public List<UserCommission> UserCommissions { get; set; }
+
+        public List<AccountCurrency> AccountCurrencies { get; set; }
+
+        public List<Operation> Operations { get; set; }
     }
 }

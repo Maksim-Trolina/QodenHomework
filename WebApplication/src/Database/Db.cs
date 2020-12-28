@@ -30,6 +30,8 @@ namespace WebApplication.Database
         {
             SetInternalKeys(modelBuilder);
             
+            SetRelations(modelBuilder);
+            
             CreateDefaultUsers(modelBuilder);
         }
 
@@ -59,10 +61,34 @@ namespace WebApplication.Database
                 .HasForeignKey(x => x.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<AccountCurrency>()
+                .HasOne(x => x.CurrencyInformation)
+                .WithMany(x => x.AccountCurrencies)
+                .HasForeignKey(x => x.CurrencyName)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserCommission>()
+                .HasOne(x => x.CurrencyInformation)
+                .WithMany(x => x.UserCommissions)
+                .HasForeignKey(x => x.CurrencyName)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Operation>()
+                .HasOne(x => x.CurrencyInformation)
+                .WithMany(x => x.Operations)
+                .HasForeignKey(x => x.CurrencyName)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Operation>()
                 .HasOne(x => x.FromAccount)
                 .WithMany(x => x.Operations)
                 .HasForeignKey(x => x.FromAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Operation>()
+                .HasOne(x => x.ToAccount)
+                .WithMany(x => x.Operations)
+                .HasForeignKey(x => x.ToAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
