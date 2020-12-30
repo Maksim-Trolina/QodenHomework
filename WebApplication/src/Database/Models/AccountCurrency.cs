@@ -9,7 +9,7 @@ namespace WebApplication.Database.Models
         public Guid AccountId { get; set; }
 
         public Account Account { get; set; }
-
+        
         public string CurrencyName { get; set; }
 
         public CurrencyInformation CurrencyInformation { get; set; }

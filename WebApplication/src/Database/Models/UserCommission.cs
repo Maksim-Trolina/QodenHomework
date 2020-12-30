@@ -11,7 +11,7 @@ namespace WebApplication.Database.Models
         public User User { get; set; }
         
         public string CurrencyName { get; set; }
-        
+
         public CurrencyInformation CurrencyInformation { get; set; }
 
         public decimal? DepositCommission { get; set; }
