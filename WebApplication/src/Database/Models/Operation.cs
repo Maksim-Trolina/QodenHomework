@@ -16,7 +16,7 @@ namespace WebApplication.Database.Models
         public Account FromAccount { get; set; }
 
         public TypeOperation Type { get; set; }
-
+        
         public string CurrencyName { get; set; }
 
         public CurrencyInformation CurrencyInformation { get; set; }
