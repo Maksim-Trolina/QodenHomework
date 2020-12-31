@@ -8,11 +8,11 @@ namespace WebApplication.Database.Models
 
         public Guid UserId { get; set; }
 
-        public User User { get; set; }
+        public virtual User User { get; set; }
         
         public string CurrencyName { get; set; }
 
-        public CurrencyInformation CurrencyInformation { get; set; }
+        public virtual CurrencyInformation CurrencyInformation { get; set; }
 
         public decimal? DepositCommission { get; set; }
 

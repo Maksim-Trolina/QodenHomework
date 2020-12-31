@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApplication.Database;
@@ -9,9 +10,10 @@ using WebApplication.Database;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20201230190038_003")]
+    partial class _003
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,11 +48,11 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("749d4cda-85c8-4af7-8fd5-1bfadeefed86"),
+                            Id = new Guid("a3946cd2-bf8a-4746-909e-b3dbc8367a6b"),
                             Name = "Admin",
                             Password = "Admin",
-                            RegistrationDate = new DateTime(2020, 12, 31, 3, 30, 33, 316, DateTimeKind.Local).AddTicks(1814),
-                            UserId = new Guid("7daf5156-f725-428a-bcb1-b5e645c2a214")
+                            RegistrationDate = new DateTime(2020, 12, 30, 22, 0, 37, 741, DateTimeKind.Local).AddTicks(1159),
+                            UserId = new Guid("c734429d-2461-4db5-b923-8aa3ff934183")
                         });
                 });
 
@@ -166,9 +168,9 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7daf5156-f725-428a-bcb1-b5e645c2a214"),
+                            Id = new Guid("c734429d-2461-4db5-b923-8aa3ff934183"),
                             Email = "Admin@com",
-                            RegistrationDate = new DateTime(2020, 12, 31, 3, 30, 33, 311, DateTimeKind.Local).AddTicks(5581),
+                            RegistrationDate = new DateTime(2020, 12, 30, 22, 0, 37, 736, DateTimeKind.Local).AddTicks(3761),
                             Role = 0
                         });
                 });

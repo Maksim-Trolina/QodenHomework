@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication.Database;
 using WebApplication.Helpers;
 
 namespace WebApplication.Controllers
@@ -9,9 +10,15 @@ namespace WebApplication.Controllers
     [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
-        public async Task<string> Hello()
+        private Db db;
+
+        public UserController(Db db)
         {
-            return User.Identity.Name;
+            this.db = db;
+        }
+        public async Task Transfer()
+        {
+            
         }
     }
 }

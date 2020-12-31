@@ -9,15 +9,15 @@ namespace WebApplication.Database.Models
         
         public Guid UserId { get; set; }
 
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         public string Name { get; set; }
         public string Password { get; set; }
 
         public DateTime RegistrationDate { get; set; }
 
-        public List<AccountCurrency> AccountCurrencies { get; set; }
+        public virtual List<AccountCurrency> AccountCurrencies { get; set; } = new List<AccountCurrency>();
 
-        public List<Operation> Operations { get; set; }
+        public virtual List<Operation> Operations { get; set; } = new List<Operation>();
     }
 }

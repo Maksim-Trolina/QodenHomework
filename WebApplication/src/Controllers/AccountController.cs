@@ -43,7 +43,7 @@ namespace WebApplication.Controllers
 
         [Authorize]
         [Route("logout")]
-        public async Task Logout()
+        public async Task SignOut()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
@@ -77,7 +77,7 @@ namespace WebApplication.Controllers
 
                 await db.Save();
 
-                await Logout();
+                await SignOut();
                 
                 await Authenticate(name);
             }
@@ -120,7 +120,7 @@ namespace WebApplication.Controllers
 
             await db.Save();
 
-            await Logout();
+            await SignOut();
         }
         
         [Authorize]

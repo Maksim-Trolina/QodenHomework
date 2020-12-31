@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApplication.Database;
@@ -9,9 +10,10 @@ using WebApplication.Database;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20201230010717_002")]
+    partial class _002
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,11 +48,11 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("749d4cda-85c8-4af7-8fd5-1bfadeefed86"),
+                            Id = new Guid("06c7fc1f-2e4c-4f68-bd40-8110e79726c3"),
                             Name = "Admin",
                             Password = "Admin",
-                            RegistrationDate = new DateTime(2020, 12, 31, 3, 30, 33, 316, DateTimeKind.Local).AddTicks(1814),
-                            UserId = new Guid("7daf5156-f725-428a-bcb1-b5e645c2a214")
+                            RegistrationDate = new DateTime(2020, 12, 30, 4, 7, 16, 933, DateTimeKind.Local).AddTicks(3101),
+                            UserId = new Guid("efa61c35-cb88-46d4-856b-c4b7c45360e8")
                         });
                 });
 
@@ -166,9 +168,9 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7daf5156-f725-428a-bcb1-b5e645c2a214"),
+                            Id = new Guid("efa61c35-cb88-46d4-856b-c4b7c45360e8"),
                             Email = "Admin@com",
-                            RegistrationDate = new DateTime(2020, 12, 31, 3, 30, 33, 311, DateTimeKind.Local).AddTicks(5581),
+                            RegistrationDate = new DateTime(2020, 12, 30, 4, 7, 16, 928, DateTimeKind.Local).AddTicks(8019),
                             Role = 0
                         });
                 });
@@ -240,13 +242,13 @@ namespace WebApplication.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WebApplication.Database.Models.Account", "FromAccount")
-                        .WithMany("Operations")
+                        .WithMany()
                         .HasForeignKey("FromAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApplication.Database.Models.Account", "ToAccount")
-                        .WithMany()
+                        .WithMany("Operations")
                         .HasForeignKey("ToAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

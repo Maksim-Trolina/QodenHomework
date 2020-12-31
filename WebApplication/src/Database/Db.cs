@@ -85,11 +85,11 @@ namespace WebApplication.Database
                 .HasForeignKey(x => x.FromAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Operation>()
+            /*modelBuilder.Entity<Operation>()
                 .HasOne(x => x.ToAccount)
                 .WithMany(x => x.Operations)
                 .HasForeignKey(x => x.ToAccountId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);*/
         }
 
         private void CreateDefaultUsers(ModelBuilder modelBuilder)
@@ -101,21 +101,24 @@ namespace WebApplication.Database
                 Role = Role.Admin,
                 RegistrationDate = DateTime.Now
             };
-
+            
+            modelBuilder.Entity<User>()
+                .HasData(admin);
+            
             Account account = new Account
             {
                 Id = Guid.NewGuid(),
                 UserId = admin.Id,
+                /*User = admin,*/
                 Name = "Admin",
                 Password = "Admin",
                 RegistrationDate = DateTime.Now
             };
 
-            modelBuilder.Entity<User>()
-                .HasData(admin);
-
             modelBuilder.Entity<Account>()
                 .HasData(account);
+            
+            
         }
     }
 }

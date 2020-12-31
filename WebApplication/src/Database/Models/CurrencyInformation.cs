@@ -18,10 +18,10 @@ namespace WebApplication.Database.Models
 
         public decimal TransferLimit { get; set; }
 
-        public List<UserCommission> UserCommissions { get; set; }
+        public virtual List<UserCommission> UserCommissions { get; set; } = new List<UserCommission>();
 
-        public List<AccountCurrency> AccountCurrencies { get; set; }
+        public virtual List<AccountCurrency> AccountCurrencies { get; set; } = new List<AccountCurrency>();
 
-        public List<Operation> Operations { get; set; }
+        public virtual List<Operation> Operations { get; set; } = new List<Operation>();
     }
 }

@@ -14,9 +14,9 @@ namespace WebApplication.Database.Models
         
         public DateTime RegistrationDate { get; set; }
 
-        public List<Account> Accounts { get; set; }
+        public virtual List<Account> Accounts { get; set; } = new List<Account>();
 
-        public List<UserCommission> UserCommissions { get; set; }
+        public virtual List<UserCommission> UserCommissions { get; set; } = new List<UserCommission>();
         
     }
 }

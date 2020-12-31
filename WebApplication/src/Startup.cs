@@ -12,7 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using WebApplication.Database;
 using Microsoft.EntityFrameworkCore.Design;
-using WebApplication.Services;
+using Microsoft.EntityFrameworkCore.Proxies;
+//using WebApplication.Services;
 
 namespace WebApplication
 {
@@ -31,9 +32,9 @@ namespace WebApplication
             
             services.AddMvc();
 
-            services.AddScoped<DatabaseService>();
+            /*services.AddScoped<DatabaseService>();
 
-            services.AddScoped<FinancialService>();
+            services.AddScoped<FinancialService>();*/
 
             ConfigureDatabase(services);
         }
@@ -57,9 +58,11 @@ namespace WebApplication
         private void ConfigureDatabase(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql();
-            services.AddDbContext<Db>((options) =>
+            services.AddDbContext<Db>((provider,options) =>
             {
-                options.UseNpgsql(configuration["Database:ConnectionString"]);
+                options
+                    .UseLazyLoadingProxies()
+                    .UseNpgsql(configuration["Database:ConnectionString"]);
             });
         }
     }
