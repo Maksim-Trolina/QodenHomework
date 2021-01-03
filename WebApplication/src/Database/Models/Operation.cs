@@ -9,17 +9,13 @@ namespace WebApplication.Database.Models
 
         public Guid ToAccountId { get; set; }
 
-        public virtual Account ToAccount { get; set; }
-
         public Guid FromAccountId { get; set; }
-        
-        public virtual Account FromAccount { get; set; }
 
         public TypeOperation Type { get; set; }
         
         public string CurrencyName { get; set; }
 
-        public virtual CurrencyInformation CurrencyInformation { get; set; }
+        public virtual Currency Currency { get; set; }
 
         public decimal Value { get; set; }
 

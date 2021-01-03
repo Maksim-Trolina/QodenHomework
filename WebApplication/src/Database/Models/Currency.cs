@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace WebApplication.Database.Models
 {
-    public class CurrencyInformation
+    public class Currency
     {
         public string Name { get; set; }
 

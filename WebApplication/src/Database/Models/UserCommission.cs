@@ -12,7 +12,7 @@ namespace WebApplication.Database.Models
         
         public string CurrencyName { get; set; }
 
-        public virtual CurrencyInformation CurrencyInformation { get; set; }
+        public virtual Currency Currency { get; set; }
 
         public decimal? DepositCommission { get; set; }
 

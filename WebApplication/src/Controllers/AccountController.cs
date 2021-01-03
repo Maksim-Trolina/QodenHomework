@@ -1,400 +1,117 @@
-/*using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using WebApplication.Database;
 using WebApplication.Database.Models;
 using WebApplication.Helpers;
-using WebApplication.Services;
 
 namespace WebApplication.Controllers
 {
-    [Route("api")]
+    [Route("account")]
     public class AccountController : ControllerBase
     {
-
-        private DatabaseService db;
-
-        private FinancialService finService;
-
-        public AccountController(DatabaseService db,FinancialService financialService)
+        private readonly Db db;
+        public AccountController(Db db)
         {
             this.db = db;
-
-            finService = financialService;
         }
-        
-        [Route("login")]
-        public async Task Login(string mail, string name, string password)
-        {
-            Account account = await db.GetAccount(mail, name, password);
 
-            if (account != null)
+        [HttpPost("sign-up/user")]
+        public async Task SignUpUser(string email,string accountName,string password)
+        {
+            var user = await db.GetUserAsync(email);
+
+            if (user == null)
             {
-                await Authenticate(name);
+                await db.AddUserAsync(email,accountName,password);
+
+                await db.SaveChangesAsync();
+
+                user = await db.GetUserAsync(email);
+
+                var account = db.GetAccount(user, accountName, password);
+
+                await Authenticate(account.Id.ToString(),Role.User.ToString());
             }
         }
 
         [Authorize]
-        [Route("logout")]
+        [HttpPost("sign-up/account")]
+        public async Task SignUpAccount(string accountName, string password)
+        {
+            var account = await db.GetAccountAsync(Guid.Parse(User.Identity.Name));
+
+            var user = account.User;
+
+            var duplicate = db.GetAccount(user, accountName, password);
+
+            if (duplicate == null)
+            {
+                await db.AddAccountAsync(user, accountName, password);
+
+                await db.SaveChangesAsync();
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("delete/account")]
+        public async Task DeleteAccount(string accountName)
+        {
+            var currentAccount = await db.GetAccountAsync(Guid.Parse(User.Identity.Name));
+
+            await db.RemoveAccountAsync(accountName, currentAccount.UserId);
+
+            await db.SaveChangesAsync();
+
+            if (currentAccount.Name == accountName)
+            {
+                await SignOut();
+            }
+        }
+
+        [HttpGet("sign-in")]
+        public async Task SignIn(string email, string accountName, string password)
+        {
+            var user = await db.GetUserAsync(email);
+
+            if (user != null)
+            {
+                var account = db.GetAccount(user, accountName, password);
+
+                if (account != null)
+                {
+                    await Authenticate(account.Id.ToString(), user.Role.ToString());
+                }
+            }
+        }
+        
+        [Authorize]
+        [HttpGet("sign-out")]
         public async Task SignOut()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
-        [Route("register/user")]
-        public async Task Register(string mail, string name, string password)
-        {
-            Account account = await db.GetAccount(name);
-
-            if (account == null)
-            {
-                await db.AddUser(mail, name, password);
-
-                await db.Save();
-
-                await Authenticate(name);
-            }
-        }
-
-        [Authorize]
-        [Route("register/account")]
-        public async Task Register(string name, string password)
-        {
-            Account account = await db.GetAccount(name);
-
-            if (account == null)
-            {
-                string mail = await db.GetMail(User.Identity.Name);
-
-                await db.AddAccount(mail, name, password);
-
-                await db.Save();
-
-                await SignOut();
-                
-                await Authenticate(name);
-            }
-        }
-
-        [Authorize]
-        [Route("delete/account")]
-        public async Task Delete(string name)
-        {
-            Role role = (Role)(await db.GetRole(User.Identity.Name));
-
-            if (role == Role.Admin && User.Identity.Name!=name)
-            {
-                await db.DeleteAccount(name);
-
-                await db.Save();
-            }
-            else
-            {
-                string mailCurrent = await db.GetMail(User.Identity.Name);
-
-                string mailDelete = await db.GetMail(name);
-
-                if (mailCurrent == mailDelete && User.Identity.Name!=name)
-                {
-                    await db.DeleteAccount(name);
-
-                    await db.Save();
-                }
-            }
-        }
-
-        [Authorize]
-        [Route("delete/user")]
-        public async Task Delete()
-        {
-            string mail = await db.GetMail(User.Identity.Name);
-
-            await db.DeleteUser(mail);
-
-            await db.Save();
-
-            await SignOut();
-        }
-        
-        [Authorize]
-        [Route("input/money")]
-        public async Task InputMoney(string name,string currencyName,decimal value)
-        {
-            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
-
-            if (currencyAccount != null)
-            {
-                string mail = await db.GetMail(name);
-                
-                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
-
-                await finService.InputMoney(mail, value, currencyAccount,User.Identity.Name,currencyAll);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("output/money")]
-        public async Task OutputMoney(string name, string currencyName, decimal value)
-        {
-            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
-
-            if (currencyAccount != null)
-            {
-                string mail = await db.GetMail(name);
-                
-                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
-
-                await finService.OutputMoney(mail, value, currencyAccount, User.Identity.Name,currencyAll);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("transfer/money")]
-        public async Task TransferMoney(string name, string currencyName, decimal value)
-        {
-            CurrencyAccount currencyAccount = await db.GetCurrencyAccount(name, currencyName);
-
-            if (currencyAccount != null)
-            {
-                string mail = await db.GetMail(name);
-                
-                CurrencyAll currencyAll = await db.GetCurrencyAll(currencyName);
-
-                await finService.TransferMoney(mail, value, currencyAccount, User.Identity.Name, currencyAll);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("add/currency")]
-        public async Task AddCurrency(string currency)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.AddCurrencyAll(currency);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("delete/currency")]
-        public async Task DeleteCurrency(string currency)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte)Role.Admin)
-            {
-                await db.DeleteCurrency(currency);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("change/input/commission")]
-        public async Task ChangeInputCommission(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.InputCommission);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/input/limit")]
-        public async Task ChangeInputLimit(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.InputLimit);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/input/min")]
-        public async Task ChangeInputMin(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinInput);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/output/commission")]
-        public async Task ChangeOutputCommission(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.OutputCommission);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/output/limit")]
-        public async Task ChangeOutputLimit(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.OutputLimit);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/output/min")]
-        public async Task ChangeOutputMin(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinOutput);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/transfer/commission")]
-        public async Task ChangeTransferCommission(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.TransferCommission);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/transfer/limit")]
-        public async Task ChangeTransferLimit(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.TransferLimit);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/transfer/min")]
-        public async Task ChangeTransferMin(string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(currency, commission,CurrencyAllOption.MinTransfer);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("change/user/input/commission")]
-        public async Task ChangeInputCommission(string mail, string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.InputCommissionUser);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/user/output/commission")]
-        public async Task ChangeOutputCommission(string mail, string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.OutputCommissionUser);
-
-                await db.Save();
-            }
-        }
-        
-        [Authorize]
-        [Route("change/user/transfer/commission")]
-        public async Task ChangeTransferCommission(string mail, string currency, decimal commission)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await db.ChangeCurrencyAllOption(mail, currency, commission, CurrencyAllOption.TransferCommissionUser);
-
-                await db.Save();
-            }
-        }
-
-        [Authorize]
-        [Route("confirm")]
-        public async Task ConfirmInput(Guid id)
-        {
-            byte role = await db.GetRole(User.Identity.Name);
-
-            if (role == (byte) Role.Admin)
-            {
-                await finService.BigMoneyOperation(id);
-            }
-        }
-
-        private async Task Authenticate(string userId)
+        private async Task Authenticate(string idAccount,string role)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userId)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, idAccount),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
             };
             
-            ClaimsIdentity id = new ClaimsIdentity(claims,"ApplicationCookie",ClaimsIdentity.DefaultNameClaimType,ClaimsIdentity.DefaultRoleClaimType);
+            var id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
+
     }
-}*/
+}

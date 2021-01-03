@@ -10,8 +10,8 @@ using WebApplication.Database;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(Db))]
-    [Migration("20201229054439_001")]
-    partial class _001
+    [Migration("20210103172627_002")]
+    partial class _002
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,34 +25,40 @@ namespace WebApplication.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("Password")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("password");
 
                     b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("registration_date");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_accounts");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("accounts");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("37dca5a0-83b6-4ace-bd89-e141670dd2d3"),
+                            Id = new Guid("ad1ef448-d663-4407-936f-8a97e01c0fea"),
                             Name = "Admin",
-                            Password = "Admin",
-                            RegistrationDate = new DateTime(2020, 12, 29, 8, 44, 39, 311, DateTimeKind.Local).AddTicks(2214),
-                            UserId = new Guid("91ed60a4-8a9d-404d-ad91-f067c1f2b8a5")
+                            Password = "AQAAAAEAACcQAAAAEL2WB5CfUjUnIvjLyFi2TOvfN98Nv/AoaTkbFUDmkuSUh34s/TuN5CwuLk+M0j3JCw==",
+                            RegistrationDate = new DateTime(2021, 1, 3, 20, 26, 26, 594, DateTimeKind.Local).AddTicks(7009),
+                            UserId = new Guid("07148ffd-69c9-4502-a5af-57e97e8d7206")
                         });
                 });
 
@@ -60,117 +66,151 @@ namespace WebApplication.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
 
                     b.Property<string>("CurrencyName")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("currency_name");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("value");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_account_currencies");
 
                     b.HasIndex("AccountId");
 
                     b.HasIndex("CurrencyName");
 
-                    b.ToTable("AccountCurrencies");
+                    b.ToTable("account_currencies");
                 });
 
-            modelBuilder.Entity("WebApplication.Database.Models.CurrencyInformation", b =>
+            modelBuilder.Entity("WebApplication.Database.Models.Currency", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<decimal>("DepositCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("deposit_commission");
 
                     b.Property<decimal>("DepositLimit")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("deposit_limit");
 
                     b.Property<decimal>("TransferCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("transfer_commission");
 
                     b.Property<decimal>("TransferLimit")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("transfer_limit");
 
                     b.Property<decimal>("WithdrawCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("withdraw_commission");
 
                     b.Property<decimal>("WithdrawLimit")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("withdraw_limit");
 
                     b.HasKey("Name");
 
-                    b.ToTable("CurrencyInformation");
+                    b.ToTable("currencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Name = "USD",
+                            DepositCommission = 10m,
+                            DepositLimit = 1000m,
+                            TransferCommission = 10m,
+                            TransferLimit = 1000m,
+                            WithdrawCommission = 10m,
+                            WithdrawLimit = 1000m
+                        });
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.Operation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("CurrencyName")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("currency_name");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("date");
 
                     b.Property<Guid>("FromAccountId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("from_account_id");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<Guid>("ToAccountId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("to_account_id");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("value");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_operations");
 
                     b.HasIndex("CurrencyName");
 
-                    b.HasIndex("FromAccountId");
-
-                    b.HasIndex("ToAccountId");
-
-                    b.ToTable("Operations");
+                    b.ToTable("operations");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("registration_date");
 
                     b.Property<int>("Role")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("role");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("91ed60a4-8a9d-404d-ad91-f067c1f2b8a5"),
+                            Id = new Guid("07148ffd-69c9-4502-a5af-57e97e8d7206"),
                             Email = "Admin@com",
-                            RegistrationDate = new DateTime(2020, 12, 29, 8, 44, 39, 306, DateTimeKind.Local).AddTicks(7984),
+                            RegistrationDate = new DateTime(2021, 1, 3, 20, 26, 26, 580, DateTimeKind.Local).AddTicks(4793),
                             Role = 0
                         });
                 });
@@ -179,30 +219,37 @@ namespace WebApplication.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("CurrencyName")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("currency_name");
 
                     b.Property<decimal?>("DepositCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("deposit_commission");
 
                     b.Property<decimal?>("TransferCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("transfer_commission");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
                     b.Property<decimal?>("WithdrawCommission")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric")
+                        .HasColumnName("withdraw_commission");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_user_commissions");
 
                     b.HasIndex("CurrencyName");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserCommissions");
+                    b.ToTable("user_commissions");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.Account", b =>
@@ -210,6 +257,7 @@ namespace WebApplication.Migrations
                     b.HasOne("WebApplication.Database.Models.User", "User")
                         .WithMany("Accounts")
                         .HasForeignKey("UserId")
+                        .HasConstraintName("fk_accounts_users_user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -221,59 +269,48 @@ namespace WebApplication.Migrations
                     b.HasOne("WebApplication.Database.Models.Account", "Account")
                         .WithMany("AccountCurrencies")
                         .HasForeignKey("AccountId")
+                        .HasConstraintName("fk_account_currencies_accounts_account_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApplication.Database.Models.CurrencyInformation", "CurrencyInformation")
+                    b.HasOne("WebApplication.Database.Models.Currency", "Currency")
                         .WithMany("AccountCurrencies")
                         .HasForeignKey("CurrencyName")
+                        .HasConstraintName("fk_account_currencies_currencies_currency_temp_id")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Account");
 
-                    b.Navigation("CurrencyInformation");
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.Operation", b =>
                 {
-                    b.HasOne("WebApplication.Database.Models.CurrencyInformation", "CurrencyInformation")
+                    b.HasOne("WebApplication.Database.Models.Currency", "Currency")
                         .WithMany("Operations")
                         .HasForeignKey("CurrencyName")
+                        .HasConstraintName("fk_operations_currencies_currency_temp_id1")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WebApplication.Database.Models.Account", "FromAccount")
-                        .WithMany()
-                        .HasForeignKey("FromAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication.Database.Models.Account", "ToAccount")
-                        .WithMany("Operations")
-                        .HasForeignKey("ToAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CurrencyInformation");
-
-                    b.Navigation("FromAccount");
-
-                    b.Navigation("ToAccount");
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.UserCommission", b =>
                 {
-                    b.HasOne("WebApplication.Database.Models.CurrencyInformation", "CurrencyInformation")
+                    b.HasOne("WebApplication.Database.Models.Currency", "Currency")
                         .WithMany("UserCommissions")
                         .HasForeignKey("CurrencyName")
+                        .HasConstraintName("fk_user_commissions_currencies_currency_temp_id2")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WebApplication.Database.Models.User", "User")
                         .WithMany("UserCommissions")
                         .HasForeignKey("UserId")
+                        .HasConstraintName("fk_user_commissions_users_user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CurrencyInformation");
+                    b.Navigation("Currency");
 
                     b.Navigation("User");
                 });
@@ -281,11 +318,9 @@ namespace WebApplication.Migrations
             modelBuilder.Entity("WebApplication.Database.Models.Account", b =>
                 {
                     b.Navigation("AccountCurrencies");
-
-                    b.Navigation("Operations");
                 });
 
-            modelBuilder.Entity("WebApplication.Database.Models.CurrencyInformation", b =>
+            modelBuilder.Entity("WebApplication.Database.Models.Currency", b =>
                 {
                     b.Navigation("AccountCurrencies");
 

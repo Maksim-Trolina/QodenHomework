@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database.Models;
 using WebApplication.Helpers;
@@ -20,7 +21,7 @@ namespace WebApplication.Database
 
         public DbSet<AccountCurrency> AccountCurrencies { get; set; }
 
-        public DbSet<CurrencyInformation> CurrencyInformation { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
 
         public DbSet<Operation> Operations { get; set; }
 
@@ -28,16 +29,21 @@ namespace WebApplication.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            SetSnakeCase(modelBuilder);
+            
             SetInternalKeys(modelBuilder);
             
             SetRelations(modelBuilder);
             
+            CreateDefaultCurrencies(modelBuilder);
+            
             CreateDefaultUsers(modelBuilder);
+            
         }
 
         private void SetInternalKeys(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CurrencyInformation>()
+            modelBuilder.Entity<Currency>()
                 .HasKey(x => x.Name);
         }
 
@@ -62,34 +68,22 @@ namespace WebApplication.Database
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<AccountCurrency>()
-                .HasOne(x => x.CurrencyInformation)
+                .HasOne(x => x.Currency)
                 .WithMany(x => x.AccountCurrencies)
                 .HasForeignKey(x => x.CurrencyName)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserCommission>()
-                .HasOne(x => x.CurrencyInformation)
+                .HasOne(x => x.Currency)
                 .WithMany(x => x.UserCommissions)
                 .HasForeignKey(x => x.CurrencyName)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Operation>()
-                .HasOne(x => x.CurrencyInformation)
+                .HasOne(x => x.Currency)
                 .WithMany(x => x.Operations)
                 .HasForeignKey(x => x.CurrencyName)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Operation>()
-                .HasOne(x => x.FromAccount)
-                .WithMany(x => x.Operations)
-                .HasForeignKey(x => x.FromAccountId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            /*modelBuilder.Entity<Operation>()
-                .HasOne(x => x.ToAccount)
-                .WithMany(x => x.Operations)
-                .HasForeignKey(x => x.ToAccountId)
-                .OnDelete(DeleteBehavior.Cascade);*/
         }
 
         private void CreateDefaultUsers(ModelBuilder modelBuilder)
@@ -105,20 +99,68 @@ namespace WebApplication.Database
             modelBuilder.Entity<User>()
                 .HasData(admin);
             
+            var hasher = new PasswordHasher<string>();
+            
             Account account = new Account
             {
                 Id = Guid.NewGuid(),
                 UserId = admin.Id,
-                /*User = admin,*/
                 Name = "Admin",
-                Password = "Admin",
+                Password = hasher.HashPassword("Admin","Admin"),
                 RegistrationDate = DateTime.Now
             };
-
+            
+            
             modelBuilder.Entity<Account>()
                 .HasData(account);
             
-            
+        }
+
+        private void CreateDefaultCurrencies(ModelBuilder modelBuilder)
+        {
+            Currency usd = new Currency
+            {
+                Name = "USD",
+                DepositCommission = 10,
+                WithdrawCommission = 10,
+                TransferCommission = 10,
+                DepositLimit = 1000,
+                WithdrawLimit = 1000,
+                TransferLimit = 1000
+            };
+
+            modelBuilder.Entity<Currency>()
+                .HasData(usd);
+        }
+        
+        private void SetSnakeCase(ModelBuilder modelBuilder)
+        {
+            foreach(var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                // Replace table names
+                entity.SetTableName(entity.GetTableName().ToSnakeCase());
+
+                // Replace column names
+                foreach(var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.Name.ToSnakeCase());
+                }
+
+                foreach(var key in entity.GetKeys())
+                {
+                    key.SetName(key.GetName().ToSnakeCase());
+                }
+
+                foreach(var key in entity.GetForeignKeys())
+                {
+                    key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
+                }
+
+                foreach(var index in entity.GetIndexes())
+                {
+                    index.SetDatabaseName(index.Name.ToSnakeCase());
+                }
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using WebApplication.Database;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Proxies;
+using WebApplication.Services;
+
 //using WebApplication.Services;
 
 namespace WebApplication
@@ -32,14 +34,11 @@ namespace WebApplication
             
             services.AddMvc();
 
-            /*services.AddScoped<DatabaseService>();
-
-            services.AddScoped<FinancialService>();*/
+            services.AddScoped<OperationService>();
 
             ConfigureDatabase(services);
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

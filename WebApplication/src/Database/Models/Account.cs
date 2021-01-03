@@ -17,7 +17,6 @@ namespace WebApplication.Database.Models
         public DateTime RegistrationDate { get; set; }
 
         public virtual List<AccountCurrency> AccountCurrencies { get; set; } = new List<AccountCurrency>();
-
-        public virtual List<Operation> Operations { get; set; } = new List<Operation>();
+        
     }
 }

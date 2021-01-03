@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApplication.Database;
@@ -9,9 +10,10 @@ using WebApplication.Database;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20210102233629_001")]
+    partial class _001
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,11 +54,11 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ad1ef448-d663-4407-936f-8a97e01c0fea"),
+                            Id = new Guid("b84ab5b5-94a6-4571-af02-59ef296543c0"),
                             Name = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEL2WB5CfUjUnIvjLyFi2TOvfN98Nv/AoaTkbFUDmkuSUh34s/TuN5CwuLk+M0j3JCw==",
-                            RegistrationDate = new DateTime(2021, 1, 3, 20, 26, 26, 594, DateTimeKind.Local).AddTicks(7009),
-                            UserId = new Guid("07148ffd-69c9-4502-a5af-57e97e8d7206")
+                            Password = "AQAAAAEAACcQAAAAEOTVMH6Ks/ifeiT/drv07DGNtzX2aBCKyZYZSJTaZhHIyM08fqIZdtA57I0JLbnH8A==",
+                            RegistrationDate = new DateTime(2021, 1, 3, 2, 36, 28, 786, DateTimeKind.Local).AddTicks(5101),
+                            UserId = new Guid("2145d43f-c46d-4fa6-912b-7fa7a983b5e8")
                         });
                 });
 
@@ -143,6 +145,10 @@ namespace WebApplication.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
                     b.Property<string>("CurrencyName")
                         .HasColumnType("text")
                         .HasColumnName("currency_name");
@@ -173,6 +179,8 @@ namespace WebApplication.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_operations");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("CurrencyName");
 
@@ -206,9 +214,9 @@ namespace WebApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("07148ffd-69c9-4502-a5af-57e97e8d7206"),
+                            Id = new Guid("2145d43f-c46d-4fa6-912b-7fa7a983b5e8"),
                             Email = "Admin@com",
-                            RegistrationDate = new DateTime(2021, 1, 3, 20, 26, 26, 580, DateTimeKind.Local).AddTicks(4793),
+                            RegistrationDate = new DateTime(2021, 1, 3, 2, 36, 28, 771, DateTimeKind.Local).AddTicks(6189),
                             Role = 0
                         });
                 });
@@ -284,6 +292,11 @@ namespace WebApplication.Migrations
 
             modelBuilder.Entity("WebApplication.Database.Models.Operation", b =>
                 {
+                    b.HasOne("WebApplication.Database.Models.Account", null)
+                        .WithMany("Operations")
+                        .HasForeignKey("AccountId")
+                        .HasConstraintName("fk_operations_accounts_account_id");
+
                     b.HasOne("WebApplication.Database.Models.Currency", "Currency")
                         .WithMany("Operations")
                         .HasForeignKey("CurrencyName")
@@ -316,6 +329,8 @@ namespace WebApplication.Migrations
             modelBuilder.Entity("WebApplication.Database.Models.Account", b =>
                 {
                     b.Navigation("AccountCurrencies");
+
+                    b.Navigation("Operations");
                 });
 
             modelBuilder.Entity("WebApplication.Database.Models.Currency", b =>
