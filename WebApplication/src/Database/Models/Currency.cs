@@ -6,11 +6,17 @@ namespace WebApplication.Database.Models
     {
         public string Name { get; set; }
 
-        public decimal DepositCommission { get; set; }
+        public decimal DepositRelativeCommission { get; set; }
 
-        public decimal WithdrawCommission { get; set; }
+        public decimal WithdrawRelativeCommission { get; set; }
 
-        public decimal TransferCommission { get; set; }
+        public decimal TransferRelativeCommission { get; set; }
+
+        public decimal DepositAbsoluteCommission { get; set; }
+
+        public decimal WithdrawAbsoluteCommission { get; set; }
+
+        public decimal TransferAbsoluteCommission { get; set; }
 
         public decimal DepositLimit { get; set; }
 

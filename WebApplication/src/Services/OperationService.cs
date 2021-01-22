@@ -6,7 +6,6 @@ using WebApplication.Helpers;
 
 namespace WebApplication.Services
 {
-
     public class OperationService
     {
         private readonly Db db;
@@ -16,86 +15,151 @@ namespace WebApplication.Services
             this.db = db;
         }
 
-        public async Task DepositForAdminAsync(Guid fromAccountId,Guid toAccountId,string currencyName ,decimal value)
+        public async Task DepositForAdminAsync(Guid fromAccountId, Guid toAccountId, string currencyName, decimal value)
         {
+            await db.TryAddAccountCurrencyAsync(toAccountId, currencyName);
+
             var accountCurrency = await db.GetAccountCurrencyAsync(toAccountId, currencyName);
 
-            if (accountCurrency != null)
+            accountCurrency.Value += value;
+
+            var operation = new Operation
             {
-                accountCurrency.Value += value;
+                Id = Guid.NewGuid(),
+                FromAccountId = fromAccountId,
+                ToAccountId = toAccountId,
+                Currency = accountCurrency.Currency,
+                Type = TypeOperation.Deposit,
+                Status = StatusOperation.Confirmed,
+                Date = DateTime.Now,
+                Value = value
+            };
 
-                var operation = new Operation
-                {
-                    Id = Guid.NewGuid(),
-                    FromAccountId = fromAccountId,
-                    ToAccountId = toAccountId,
-                    Currency = accountCurrency.Currency,
-                    Type = TypeOperation.Deposit,
-                    Status = StatusOperation.Confirmed,
-                    Date = DateTime.Now,
-                    Value = value
-                };
-
-                await db.AddOperationAsync(operation);
-            }
+            await db.AddOperationAsync(operation);
         }
 
-        public async Task WithdrawForAdminAsync(Guid fromAccountId,Guid toAccountId,string currencyName ,decimal value)
+        public async Task WithdrawForAdminAsync(Guid fromAccountId, Guid toAccountId, string currencyName,
+            decimal value)
         {
+            await db.TryAddAccountCurrencyAsync(toAccountId, currencyName);
+
             var accountCurrency = await db.GetAccountCurrencyAsync(toAccountId, currencyName);
 
-            if (accountCurrency != null)
+            accountCurrency.Value -= value;
+
+            var operation = new Operation
             {
-                accountCurrency.Value -= value;
+                Id = Guid.NewGuid(),
+                FromAccountId = fromAccountId,
+                ToAccountId = toAccountId,
+                Currency = accountCurrency.Currency,
+                Type = TypeOperation.Withdraw,
+                Status = StatusOperation.Confirmed,
+                Date = DateTime.Now,
+                Value = value
+            };
 
-                var operation = new Operation
-                {
-                    Id = Guid.NewGuid(),
-                    FromAccountId = fromAccountId,
-                    ToAccountId = toAccountId,
-                    Currency = accountCurrency.Currency,
-                    Type = TypeOperation.Withdraw,
-                    Status = StatusOperation.Confirmed,
-                    Date = DateTime.Now,
-                    Value = value
-                };
-
-                await db.AddOperationAsync(operation);
-            }
+            await db.AddOperationAsync(operation);
         }
 
-        public async Task DepositForUserAsync(Guid accountId, string currencyName, decimal value,bool isConfirmed=false)
+        public async Task DepositForUserAsync(Guid accountId, string currencyName, decimal value,
+            bool isConfirmed = false)
         {
+            await db.TryAddAccountCurrencyAsync(accountId, currencyName);
+
             var accountCurrency = await db.GetAccountCurrencyAsync(accountId, currencyName);
 
-            if (accountCurrency != null)
+            var account = accountCurrency.Account;
+
+            var userCommission = await db.GetUserCommissionAsync(account.UserId, currencyName);
+
+            var depositRelativeCommission = userCommission?.DepositRelativeCommission;
+
+            var currency = accountCurrency.Currency;
+
+            depositRelativeCommission ??= currency.DepositRelativeCommission;
+
+            var depositAbsoluteCommission = currency.DepositAbsoluteCommission;
+
+            var commission = Math.Max((decimal) (value * depositRelativeCommission / 100), depositAbsoluteCommission);
+
+            if (value <= commission)
             {
-                var account = accountCurrency.Account;
+                return;
+            }
 
-                var userCommission = await db.GetUserCommissionAsync(account.UserId, currencyName);
+            if (isConfirmed)
+            {
+                Deposit(value, commission, accountCurrency);
 
-                var depositCommission = userCommission?.DepositCommission;
+                return;
+            }
 
-                var currency = accountCurrency.Currency;
+            var statusOperation = StatusOperation.Confirmed;
 
-                depositCommission ??= currency.DepositCommission;
-                
+            if (value > currency.DepositLimit)
+            {
+                statusOperation = StatusOperation.Pending;
+            }
+            else
+            {
+                Deposit(value, commission, accountCurrency);
+            }
+
+            var operation = new Operation
+            {
+                Id = Guid.NewGuid(),
+                FromAccountId = accountId,
+                ToAccountId = accountId,
+                Type = TypeOperation.Deposit,
+                Currency = currency,
+                Value = value,
+                Status = statusOperation,
+                Date = DateTime.Now
+            };
+
+            await db.AddOperationAsync(operation);
+        }
+
+        public async Task<bool> WithdrawForUserAsync(Guid accountId, string currencyName, decimal value,
+            bool isConfirmed = false)
+        {
+            await db.TryAddAccountCurrencyAsync(accountId, currencyName);
+
+            var accountCurrency = await db.GetAccountCurrencyAsync(accountId, currencyName);
+
+            var account = accountCurrency.Account;
+
+            var userCommission = await db.GetUserCommissionAsync(account.UserId, currencyName);
+
+            var withdrawRelativeCommission = userCommission?.WithdrawRelativeCommission;
+
+            var currency = accountCurrency.Currency;
+
+            withdrawRelativeCommission ??= currency.WithdrawRelativeCommission;
+
+            var withdrawAbsoluteCommission = currency.WithdrawAbsoluteCommission;
+
+            var commission = Math.Max((decimal) (value * withdrawRelativeCommission / 100), withdrawAbsoluteCommission);
+
+            if (accountCurrency.Value >= value + commission)
+            {
                 if (isConfirmed)
                 {
-                   Deposit(value,depositCommission,accountCurrency);
-                    
-                    return;
+                    Withdraw(value, commission, accountCurrency);
+
+                    return true;
                 }
 
                 var statusOperation = StatusOperation.Confirmed;
 
-                if (value > currency.DepositLimit)
+                if (value > currency.WithdrawLimit)
                 {
                     statusOperation = StatusOperation.Pending;
                 }
                 else
                 {
-                    Deposit(value,depositCommission,accountCurrency);
+                    Withdraw(value, commission, accountCurrency);
                 }
 
                 var operation = new Operation
@@ -103,7 +167,7 @@ namespace WebApplication.Services
                     Id = Guid.NewGuid(),
                     FromAccountId = accountId,
                     ToAccountId = accountId,
-                    Type = TypeOperation.Deposit,
+                    Type = TypeOperation.Withdraw,
                     Currency = currency,
                     Value = value,
                     Status = statusOperation,
@@ -111,61 +175,8 @@ namespace WebApplication.Services
                 };
 
                 await db.AddOperationAsync(operation);
-            }
-        }
 
-        public async Task<bool> WithdrawForUserAsync(Guid accountId, string currencyName, decimal value,bool isConfirmed=false)
-        {
-            var accountCurrency = await db.GetAccountCurrencyAsync(accountId, currencyName);
-
-            if (accountCurrency != null)
-            {
-                var account = accountCurrency.Account;
-
-                var userCommission = await db.GetUserCommissionAsync(account.UserId, currencyName);
-
-                var withdrawCommission = userCommission?.WithdrawCommission;
-
-                var currency = accountCurrency.Currency;
-
-                withdrawCommission ??= currency.WithdrawCommission;
-
-                if (accountCurrency.Value >= value*(1+withdrawCommission/100))
-                {
-                    if (isConfirmed)
-                    {
-                        Withdraw(value,withdrawCommission,accountCurrency);
-                        
-                        return true;
-                    }
-                    var statusOperation = StatusOperation.Confirmed;
-                    
-                    if (value > currency.WithdrawLimit)
-                    {
-                        statusOperation = StatusOperation.Pending;
-                    }
-                    else
-                    {
-                        Withdraw(value,withdrawCommission,accountCurrency);
-                    }
-
-                    var operation = new Operation
-                    {
-                        Id = Guid.NewGuid(),
-                        FromAccountId = accountId,
-                        ToAccountId = accountId,
-                        Type = TypeOperation.Withdraw,
-                        Currency = currency,
-                        Value = value,
-                        Status = statusOperation,
-                        Date = DateTime.Now
-                    };
-
-                    await db.AddOperationAsync(operation);
-
-                    return true;
-                }
-                
+                return true;
             }
 
             return false;
@@ -174,59 +185,65 @@ namespace WebApplication.Services
         public async Task<bool> TransferForUserAsync(Guid fromAccountId, Guid toAccountId, string currencyName,
             decimal value, bool isConfirmed = false)
         {
+            await db.TryAddAccountCurrencyAsync(toAccountId, currencyName);
+
+            await db.TryAddAccountCurrencyAsync(fromAccountId, currencyName);
+
             var toAccountCurrency = await db.GetAccountCurrencyAsync(toAccountId, currencyName);
 
             var fromAccountCurrency = await db.GetAccountCurrencyAsync(fromAccountId, currencyName);
 
-            if (toAccountCurrency != null && fromAccountCurrency != null)
+            var fromAccount = fromAccountCurrency.Account;
+
+            var userCommission = await db.GetUserCommissionAsync(fromAccount.UserId, currencyName);
+
+            var transferRelativeCommission = userCommission?.TransferRelativeCommission;
+
+            var currency = fromAccountCurrency.Currency;
+
+            transferRelativeCommission ??= currency.TransferRelativeCommission;
+
+            var transferAbsoluteCommission = currency.TransferAbsoluteCommission;
+
+            var commission = Math.Max((decimal) (value * transferRelativeCommission / 100), transferAbsoluteCommission);
+
+            if (fromAccountCurrency.Value >= value + commission)
             {
-                var fromAccount = fromAccountCurrency.Account;
-
-                var userCommission = await db.GetUserCommissionAsync(fromAccount.UserId, currencyName);
-
-                var transferCommission = userCommission?.TransferCommission;
-
-                var currency = fromAccountCurrency.Currency;
-
-                transferCommission ??= currency.TransferCommission;
-
-                if (fromAccountCurrency.Value >= value*(1+transferCommission/100))
+                if (isConfirmed)
                 {
-                    if (isConfirmed)
-                    {
-                        Transfer(value,transferCommission,toAccountCurrency,fromAccountCurrency);
-                        
-                        return true;
-                    }
-
-                    var statusOperation = StatusOperation.Confirmed;
-
-                    if (value > currency.TransferLimit)
-                    {
-                        statusOperation = StatusOperation.Pending;
-                    }
-                    else
-                    {
-                        Transfer(value,transferCommission,toAccountCurrency,fromAccountCurrency);
-                    }
-                    
-                    var operation = new Operation
-                    {
-                        Id = Guid.NewGuid(),
-                        FromAccountId = fromAccountId,
-                        ToAccountId = toAccountId,
-                        Type = TypeOperation.Transfer,
-                        Currency = currency,
-                        Value = value,
-                        Status = statusOperation,
-                        Date = DateTime.Now
-                    };
-
-                    await db.AddOperationAsync(operation);
+                    Transfer(value, commission, toAccountCurrency,
+                        fromAccountCurrency);
 
                     return true;
                 }
-                
+
+                var statusOperation = StatusOperation.Confirmed;
+
+                if (value > currency.TransferLimit)
+                {
+                    statusOperation = StatusOperation.Pending;
+                }
+                else
+                {
+                    Transfer(value, commission, toAccountCurrency,
+                        fromAccountCurrency);
+                }
+
+                var operation = new Operation
+                {
+                    Id = Guid.NewGuid(),
+                    FromAccountId = fromAccountId,
+                    ToAccountId = toAccountId,
+                    Type = TypeOperation.Transfer,
+                    Currency = currency,
+                    Value = value,
+                    Status = statusOperation,
+                    Date = DateTime.Now
+                };
+
+                await db.AddOperationAsync(operation);
+
+                return true;
             }
 
             return false;
@@ -239,15 +256,17 @@ namespace WebApplication.Services
             switch (operation.Type)
             {
                 case TypeOperation.Deposit:
-                    await DepositForUserAsync(operation.FromAccountId,operation.CurrencyName,operation.Value,true);
+                    await DepositForUserAsync(operation.FromAccountId, operation.CurrencyName, operation.Value, true);
                     operation.UpdateStatus(StatusOperation.Confirmed);
                     break;
                 case TypeOperation.Withdraw:
-                    var isSuccessful = await WithdrawForUserAsync(operation.FromAccountId, operation.CurrencyName, operation.Value, true);
+                    var isSuccessful = await WithdrawForUserAsync(operation.FromAccountId, operation.CurrencyName,
+                        operation.Value, true);
                     if (isSuccessful)
                     {
                         operation.UpdateStatus(StatusOperation.Confirmed);
                     }
+
                     break;
                 case TypeOperation.Transfer:
                     isSuccessful = await TransferForUserAsync(operation.FromAccountId, operation.ToAccountId,
@@ -256,36 +275,35 @@ namespace WebApplication.Services
                     {
                         operation.UpdateStatus(StatusOperation.Confirmed);
                     }
+
                     break;
             }
         }
 
-        private void Deposit(decimal value, decimal? depositCommission, AccountCurrency accountCurrency)
+        private void Deposit(decimal value, decimal commission, AccountCurrency accountCurrency)
         {
-            value = (decimal) (value * (decimal.One - depositCommission/100));
+            value -= commission;
 
             accountCurrency.Value += value;
         }
 
-        private void Withdraw(decimal value, decimal? withdrawCommission, AccountCurrency accountCurrency)
+        private void Withdraw(decimal value, decimal commission, AccountCurrency accountCurrency)
         {
-            value = (decimal) (value * (decimal.One + withdrawCommission/100));
-                        
+            value += commission;
+
             accountCurrency.Value -= value;
         }
 
-        private void Transfer(decimal value, decimal? transferCommission, AccountCurrency toAccountCurrency,
+        private void Transfer(decimal value, decimal commission, AccountCurrency toAccountCurrency,
             AccountCurrency fromAccountCurrency)
         {
-            value = (decimal) (value * (decimal.One + transferCommission / 100));
-            
+            value += commission;
+
             fromAccountCurrency.Value -= value;
 
-            value /= (decimal)(decimal.One + transferCommission / 100);
+            value -= commission;
 
             toAccountCurrency.Value += value;
         }
-        
-        
     }
 }

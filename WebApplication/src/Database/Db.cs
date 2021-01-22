@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Database.Models;
@@ -12,7 +11,6 @@ namespace WebApplication.Database
         public Db(DbContextOptions<Db> options)
             : base(options)
         {
-
         }
 
         public DbSet<User> Users { get; set; }
@@ -30,15 +28,14 @@ namespace WebApplication.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             SetSnakeCase(modelBuilder);
-            
+
             SetInternalKeys(modelBuilder);
-            
+
             SetRelations(modelBuilder);
-            
+
             CreateDefaultCurrencies(modelBuilder);
-            
+
             CreateDefaultUsers(modelBuilder);
-            
         }
 
         private void SetInternalKeys(ModelBuilder modelBuilder)
@@ -95,25 +92,24 @@ namespace WebApplication.Database
                 Role = Role.Admin,
                 RegistrationDate = DateTime.Now
             };
-            
+
             modelBuilder.Entity<User>()
                 .HasData(admin);
-            
+
             var hasher = new PasswordHasher<string>();
-            
+
             Account account = new Account
             {
                 Id = Guid.NewGuid(),
                 UserId = admin.Id,
                 Name = "Admin",
-                Password = hasher.HashPassword("Admin","Admin"),
+                Password = hasher.HashPassword("Admin", "Admin"),
                 RegistrationDate = DateTime.Now
             };
-            
-            
+
+
             modelBuilder.Entity<Account>()
                 .HasData(account);
-            
         }
 
         private void CreateDefaultCurrencies(ModelBuilder modelBuilder)
@@ -121,9 +117,12 @@ namespace WebApplication.Database
             Currency usd = new Currency
             {
                 Name = "USD",
-                DepositCommission = 10,
-                WithdrawCommission = 10,
-                TransferCommission = 10,
+                DepositRelativeCommission = 10,
+                WithdrawRelativeCommission = 10,
+                TransferRelativeCommission = 10,
+                DepositAbsoluteCommission = 100,
+                WithdrawAbsoluteCommission = 100,
+                TransferAbsoluteCommission = 100,
                 DepositLimit = 1000,
                 WithdrawLimit = 1000,
                 TransferLimit = 1000
@@ -132,35 +131,37 @@ namespace WebApplication.Database
             modelBuilder.Entity<Currency>()
                 .HasData(usd);
         }
-        
+
         private void SetSnakeCase(ModelBuilder modelBuilder)
         {
-            foreach(var entity in modelBuilder.Model.GetEntityTypes())
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 // Replace table names
                 entity.SetTableName(entity.GetTableName().ToSnakeCase());
 
                 // Replace column names
-                foreach(var property in entity.GetProperties())
+                foreach (var property in entity.GetProperties())
                 {
                     property.SetColumnName(property.Name.ToSnakeCase());
                 }
 
-                foreach(var key in entity.GetKeys())
+                foreach (var key in entity.GetKeys())
                 {
                     key.SetName(key.GetName().ToSnakeCase());
                 }
 
-                foreach(var key in entity.GetForeignKeys())
+                foreach (var key in entity.GetForeignKeys())
                 {
                     key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
                 }
 
-                foreach(var index in entity.GetIndexes())
+                foreach (var index in entity.GetIndexes())
                 {
                     index.SetDatabaseName(index.Name.ToSnakeCase());
                 }
             }
         }
+        
+        
     }
 }

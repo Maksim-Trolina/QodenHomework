@@ -97,7 +97,7 @@ namespace WebApplication.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<decimal>("DepositCommission")
+                    b.Property<decimal>("DepositRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("deposit_commission");
 
@@ -105,7 +105,7 @@ namespace WebApplication.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("deposit_limit");
 
-                    b.Property<decimal>("TransferCommission")
+                    b.Property<decimal>("TransferRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("transfer_commission");
 
@@ -113,7 +113,7 @@ namespace WebApplication.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("transfer_limit");
 
-                    b.Property<decimal>("WithdrawCommission")
+                    b.Property<decimal>("WithdrawRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("withdraw_commission");
 
@@ -232,11 +232,11 @@ namespace WebApplication.Migrations
                         .HasColumnType("text")
                         .HasColumnName("currency_name");
 
-                    b.Property<decimal?>("DepositCommission")
+                    b.Property<decimal?>("DepositRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("deposit_commission");
 
-                    b.Property<decimal?>("TransferCommission")
+                    b.Property<decimal?>("TransferRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("transfer_commission");
 
@@ -244,7 +244,7 @@ namespace WebApplication.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<decimal?>("WithdrawCommission")
+                    b.Property<decimal?>("WithdrawRelativeCommission")
                         .HasColumnType("numeric")
                         .HasColumnName("withdraw_commission");
 
