@@ -13,15 +13,15 @@ namespace WebApplication.Controllers
     [Route("api/v1/authenticate")]
     public class AuthenticateController : ControllerBase
     {
-        private readonly Db db;
+        private readonly IDb db;
 
-        public AuthenticateController(Db db)
+        public AuthenticateController(IDb db)
         {
             this.db = db;
         }
 
         [HttpPost("sign-up")]
-        public async Task SignUpUser(string email, string accountName, string password)
+        public async Task SignUpAsync(string email, string accountName, string password)
         {
             var user = await db.GetUserAsync(email);
 
@@ -29,40 +29,36 @@ namespace WebApplication.Controllers
             {
                 await db.AddUserAsync(email, accountName, password);
 
-                await db.SaveChangesAsync();
-
                 user = await db.GetUserAsync(email);
 
                 var account = db.GetAccount(user, accountName, password);
 
-                await Authenticate(account.Id.ToString(), Role.User.ToString());
+                await AuthenticateAsync(account.Id.ToString(), Role.User.ToString());
             }
         }
 
         [HttpGet("sign-in")]
-        public async Task SignIn(string email, string accountName, string password)
+        public async Task<bool> SignInAsync(string email, string accountName, string password)
         {
             var user = await db.GetUserAsync(email);
 
-            if (user != null)
-            {
-                var account = db.GetAccount(user, accountName, password);
+            if (user == null) return false;
+            var account = db.GetAccount(user, accountName, password);
 
-                if (account != null)
-                {
-                    await Authenticate(account.Id.ToString(), user.Role.ToString());
-                }
-            }
+            if (account == null) return false;
+            await AuthenticateAsync(account.Id.ToString(), user.Role.ToString());
+
+            return true;
         }
 
         [Authorize]
         [HttpGet("sign-out")]
-        public async Task SignOut()
+        public async Task SignOutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
-        private async Task Authenticate(string idAccount, string role)
+        private async Task AuthenticateAsync(string idAccount, string role)
         {
             var claims = new List<Claim>
             {

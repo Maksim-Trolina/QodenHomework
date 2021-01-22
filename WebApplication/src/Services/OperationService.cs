@@ -8,9 +8,9 @@ namespace WebApplication.Services
 {
     public class OperationService
     {
-        private readonly Db db;
+        private readonly IDb db;
 
-        public OperationService(Db db)
+        public OperationService(IDb db)
         {
             this.db = db;
         }

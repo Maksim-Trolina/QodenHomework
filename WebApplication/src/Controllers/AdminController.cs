@@ -13,11 +13,11 @@ namespace WebApplication.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly Db db;
+        private readonly IDb db;
 
         private readonly OperationService operationService;
 
-        public AdminController(Db db, OperationService operationService)
+        public AdminController(IDb db, OperationService operationService)
         {
             this.db = db;
 
@@ -25,23 +25,19 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost("currency/create")]
-        public async Task CreateCurrency(Currency currency)
+        public async Task CreateCurrencyAsync(Currency currency)
         {
             await db.AddCurrencyAsync(currency);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpDelete("currency/delete")]
-        public async Task DeleteCurrency(string name)
+        public async Task DeleteCurrencyAsync(string name)
         {
             await db.RemoveCurrencyAsync(name);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("currency/commission/update")]
-        public async Task UpdateCommission(string currencyName, decimal? depositRelativeCommission,
+        public async Task UpdateCommissionAsync(string currencyName, decimal? depositRelativeCommission,
             decimal? withdrawRelativeCommission, decimal? transferRelativeCommission,
             decimal? depositAbsoluteCommission, decimal? withdrawAbsoluteCommission,
             decimal? transferAbsoluteCommission)
@@ -49,61 +45,48 @@ namespace WebApplication.Controllers
             await db.UpdateCurrencyCommissionAsync(currencyName, depositRelativeCommission, withdrawRelativeCommission,
                 transferRelativeCommission, depositAbsoluteCommission, withdrawAbsoluteCommission,
                 transferAbsoluteCommission);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("currency/limit/update")]
-        public async Task UpdateLimit(string currencyName, decimal? deposit, decimal? withdraw, decimal? transfer)
+        public async Task UpdateLimitAsync(string currencyName, decimal? deposit, decimal? withdraw, decimal? transfer)
         {
             await db.UpdateCurrencyLimitAsync(currencyName, deposit, withdraw, transfer);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("currency/commission/user/update")]
-        public async Task UpdateCommissionUser(string currencyName, Guid userId, decimal? depositRelativeCommission,
+        public async Task UpdateCommissionUserAsync(string currencyName, Guid userId,
+            decimal? depositRelativeCommission,
             decimal? withdrawRelativeCommission,
             decimal? transferRelativeCommission)
         {
             await db.AddOrUpdateUserCommissionAsync(currencyName, userId, depositRelativeCommission,
                 withdrawRelativeCommission, transferRelativeCommission);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpDelete("currency/commission/user/delete")]
-        public async Task DeleteUserCommission(string currencyName, Guid userId, TypeOperation operation)
+        public async Task DeleteUserCommissionAsync(string currencyName, Guid userId, TypeOperation operation)
         {
             await db.RemoveUserCommissionAsync(currencyName, userId, operation);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("deposit/user")]
-        public async Task Deposit(Guid toAccountId, string currencyName, decimal value)
+        public async Task DepositAsync(Guid toAccountId, string currencyName, decimal value)
         {
             await operationService.DepositForAdminAsync(Guid.Parse(User.Identity.Name), toAccountId, currencyName,
                 value);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("withdraw/user")]
-        public async Task Withdraw(Guid toAccountId, string currencyName, decimal value)
+        public async Task WithdrawAsync(Guid toAccountId, string currencyName, decimal value)
         {
             await operationService.WithdrawForAdminAsync(Guid.Parse(User.Identity.Name), toAccountId, currencyName,
                 value);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("operation/confirm")]
-        public async Task ConfirmOperation(Guid operationId)
+        public async Task ConfirmOperationAsync(Guid operationId)
         {
             await operationService.ConfirmOperationAsync(operationId);
-
-            await db.SaveChangesAsync();
         }
     }
 }

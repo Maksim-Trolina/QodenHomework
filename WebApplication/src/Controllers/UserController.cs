@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Database;
-using WebApplication.Helpers;
 using WebApplication.Services;
 
 namespace WebApplication.Controllers
@@ -14,11 +13,11 @@ namespace WebApplication.Controllers
     [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
-        private readonly Db db;
+        private readonly IDb db;
 
         private readonly OperationService operationService;
 
-        public UserController(Db db, OperationService operationService)
+        public UserController(IDb db, OperationService operationService)
         {
             this.db = db;
 
@@ -26,7 +25,7 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost("account/create")]
-        public async Task CreateAccount(string accountName, string password)
+        public async Task CreateAccountAsync(string accountName, string password)
         {
             var account = await db.GetAccountAsync(Guid.Parse(User.Identity.Name));
 
@@ -37,57 +36,48 @@ namespace WebApplication.Controllers
             if (duplicate == null)
             {
                 await db.AddAccountAsync(user, accountName, password);
-
-                await db.SaveChangesAsync();
             }
         }
 
         [HttpDelete("account/delete")]
-        public async Task DeleteAccount(string accountName)
+        public async Task DeleteAccountAsync(string accountName)
         {
             var currentAccount = await db.GetAccountAsync(Guid.Parse(User.Identity.Name));
 
             await db.RemoveAccountAsync(accountName, currentAccount.UserId);
 
-            await db.SaveChangesAsync();
 
             if (currentAccount.Name == accountName)
             {
-                await SignOut();
+                await SignOutAsync();
             }
         }
 
         [HttpPut("deposit")]
-        public async Task Deposit(string currencyName, decimal value)
+        public async Task DepositAsync(string currencyName, decimal value)
         {
             await operationService.DepositForUserAsync(Guid.Parse(User.Identity.Name), currencyName, value);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("withdraw")]
-        public async Task Withdraw(string currencyName, decimal value)
+        public async Task WithdrawAsync(string currencyName, decimal value)
         {
             await operationService.WithdrawForUserAsync(Guid.Parse(User.Identity.Name), currencyName, value);
-
-            await db.SaveChangesAsync();
         }
 
         [HttpPut("transfer")]
-        public async Task Transfer(string currencyName, decimal value, Guid toAccountId)
+        public async Task TransferAsync(string currencyName, decimal value, Guid toAccountId)
         {
-            Guid fromAccountId = Guid.Parse(User.Identity.Name);
+            var fromAccountId = Guid.Parse(User.Identity.Name);
 
             if (toAccountId != fromAccountId)
             {
                 await operationService.TransferForUserAsync(fromAccountId, toAccountId, currencyName,
                     value);
-
-                await db.SaveChangesAsync();
             }
         }
 
-        private async Task SignOut()
+        private async Task SignOutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
