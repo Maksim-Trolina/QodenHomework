@@ -17,7 +17,7 @@ namespace WebApplication.Controllers
 
         private readonly OperationService operationService;
 
-        public UserController(IDb db, OperationService operationService)
+        public UserController(Db db, OperationService operationService)
         {
             this.db = db;
 

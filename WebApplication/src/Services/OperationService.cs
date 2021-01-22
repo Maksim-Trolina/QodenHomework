@@ -10,7 +10,7 @@ namespace WebApplication.Services
     {
         private readonly IDb db;
 
-        public OperationService(IDb db)
+        public OperationService(Db db)
         {
             this.db = db;
         }

@@ -15,7 +15,7 @@ namespace WebApplication.Controllers
     {
         private readonly IDb db;
 
-        public AuthenticateController(IDb db)
+        public AuthenticateController(Db db)
         {
             this.db = db;
         }
