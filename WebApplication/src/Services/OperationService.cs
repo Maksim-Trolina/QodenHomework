@@ -15,6 +15,11 @@ namespace WebApplication.Services
             this.db = db;
         }
 
+        public OperationService(IDb db)
+        {
+            this.db = db;
+        }
+
         public async Task DepositForAdminAsync(Guid fromAccountId, Guid toAccountId, string currencyName, decimal value)
         {
             await db.TryAddAccountCurrencyAsync(toAccountId, currencyName);
